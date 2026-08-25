@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>السؤال الذي بدأ الحكاية ⚛️</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ===================== Design tokens ===================== */
+:root{
+  --bg-0:#050a13;
+  --bg-1:#0b1424;
+  --glass:rgba(255,255,255,0.045);
+  --glass-border:rgba(255,255,255,0.09);
+  --line:rgba(120,190,255,0.16);
+  --cyan:#4fd9e8;
+  --cyan-glow:rgba(79,217,232,0.55);
+  --violet:#9b8cff;
+  --violet-glow:rgba(155,140,255,0.5);
+  --amber:#f2b705;
+  --ink:#eef2f7;
+  --ink-dim:#9fb0c6;
+  --ink-faint:#657185;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0; height:100%; overflow-x:hidden;}
+body{
+  background:
+    radial-gradient(circle at 20% 10%, rgba(79,217,232,0.08), transparent 42%),
+    radial-gradient(circle at 82% 85%, rgba(155,140,255,0.10), transparent 45%),
+    var(--bg-0);
+  color:var(--ink);
+  font-family:'Tajawal', sans-serif;
+  min-height:100vh;
+  position:relative;
+}
+h1,h2,h3,.display{ font-family:'Almarai', sans-serif; font-weight:800; }
+button{ font-family:'Tajawal', sans-serif; }
+
+/* ===================== Stage & particles ===================== */
+.stage{ position:relative; min-height:100vh; width:100%; overflow:hidden; }
+#particles{ position:fixed; inset:0; z-index:0; opacity:0.55; pointer-events:none; }
+
+/* ===================== Top bar ===================== */
+.top-controls{
+  position:fixed; top:14px; left:14px; right:14px; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  pointer-events:none;
+}
+.top-controls > *{ pointer-events:auto; }
+.icon-cluster{ display:flex; gap:8px; }
+.icon-btn{
+  width:38px; height:38px; border-radius:11px;
+  background:var(--glass); border:1px solid var(--glass-border);
+  backdrop-filter:blur(10px);
+  color:var(--ink-dim); font-size:16px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s ease; opacity:0.75;
+}
+.icon-btn:hover{ opacity:1; border-color:var(--cyan); color:var(--cyan); }
+.points-badge{
+  font-family:'Almarai',sans-serif; font-weight:700; font-size:13px;
+  background:var(--glass); border:1px solid var(--glass-border);
+  backdrop-filter:blur(10px);
+  padding:8px 14px; border-radius:999px; color:var(--amber);
+  display:flex; align-items:center; gap:6px;
+  transition:transform .25s ease;
+}
+.points-badge.pulse{ transform:scale(1.14); }
+
+/* ===================== Progress bar ===================== */
+.progress-wrap{
+  position:fixed; top:0; left:0; right:0; height:4px; z-index:60;
+  background:rgba(255,255,255,0.05);
+}
+.progress-fill{
+  height:100%; width:0%;
+  background:linear-gradient(90deg, var(--cyan), var(--violet));
+  box-shadow:0 0 12px 2px var(--cyan-glow);
+  transition:width .6s ease;
+}
+
+/* ===================== Scenes ===================== */
+.scene{
+  position:absolute; inset:0; z-index:1;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:90px 20px 40px;
+  min-height:100vh;
+  opacity:0; transform:scale(0.97) translateY(6px);
+  pointer-events:none; transition:opacity .55s ease, transform .55s ease;
+  text-align:center;
+}
+.scene.active{ position:relative; opacity:1; transform:scale(1) translateY(0); pointer-events:auto; z-index:2; }
+
+.scene-inner{ width:100%; max-width:760px; margin:0 auto; }
+
+.eyebrow{
+  font-family:'Almarai',sans-serif; font-weight:700; font-size:12.5px;
+  color:var(--cyan); letter-spacing:0.5px;
+  background:rgba(79,217,232,0.1); border:1px solid rgba(79,217,232,0.3);
+  padding:5px 14px; border-radius:999px; display:inline-block; margin-bottom:22px;
+}
+
+.line{
+  font-size:clamp(16px,3.4vw,20px); line-height:2; color:var(--ink-dim);
+  opacity:0; transform:translateY(8px);
+  transition:opacity .6s ease, transform .6s ease;
+  margin:4px 0;
+}
+.line.show{ opacity:1; transform:translateY(0); }
+
+.big-word{
+  font-family:'Almarai',sans-serif; font-weight:800;
+  font-size:clamp(40px,9vw,74px);
+  margin:26px 0; color:var(--ink);
+  text-shadow:0 0 40px var(--cyan-glow), 0 0 80px var(--cyan-glow);
+  opacity:0; transform:scale(0.85);
+  transition:opacity .8s ease, transform .8s ease;
+}
+.big-word.show{ opacity:1; transform:scale(1); }
+
+.title-lg{ font-size:clamp(24px,4.6vw,36px); line-height:1.5; margin:0 0 18px; }
+.subtitle{ color:var(--ink-dim); font-size:clamp(14px,2.4vw,16.5px); line-height:1.9; margin-bottom:28px; }
+
+/* ===================== Buttons ===================== */
+.btn{
+  font-family:'Almarai',sans-serif; font-weight:700; font-size:15.5px;
+  border:none; border-radius:14px; padding:15px 28px; cursor:pointer;
+  transition:transform .15s ease, box-shadow .2s ease, opacity .2s ease, background .2s ease;
+}
+.btn:active{ transform:scale(0.96); }
+.btn:disabled{ opacity:0.35; cursor:not-allowed; }
+.btn-primary{
+  background:linear-gradient(135deg, var(--cyan), #7fd8ff);
+  color:#03222a; box-shadow:0 10px 26px -10px var(--cyan-glow);
+}
+.btn-primary:not(:disabled):hover{ box-shadow:0 14px 32px -8px var(--cyan-glow); }
+.btn-ghost{
+  background:var(--glass); border:1px solid var(--glass-border); color:var(--ink);
+  backdrop-filter:blur(8px);
+}
+.btn-ghost:hover{ border-color:var(--cyan); color:var(--cyan); }
+.fade-in-btn{ opacity:0; transform:translateY(10px); transition:opacity .6s ease, transform .6s ease; }
+.fade-in-btn.show{ opacity:1; transform:translateY(0); }
+
+.scene-back{
+  position:absolute; top:60px; right:24px; z-index:5;
+  font-size:13px; color:var(--ink-faint); background:transparent; border:none;
+  cursor:pointer; opacity:0.6; transition:opacity .2s ease;
+}
+.scene-back:hover{ opacity:1; color:var(--cyan); }
+
+/* ===================== Choice cards (egg/chicken, A/B) ===================== */
+.choice-row{ display:flex; gap:18px; justify-content:center; flex-wrap:wrap; margin-top:8px; }
+.choice-card{
+  width:180px; padding:26px 16px;
+  background:var(--glass); border:1px solid var(--glass-border);
+  border-radius:18px; backdrop-filter:blur(10px);
+  cursor:pointer; transition:all .22s ease;
+}
+.choice-card:hover{ border-color:var(--cyan); transform:translateY(-4px); box-shadow:0 16px 30px -16px var(--cyan-glow); }
+.choice-card.chosen{ border-color:var(--violet); box-shadow:0 0 0 2px var(--violet) inset, 0 16px 30px -14px var(--violet-glow); }
+.choice-card .emoji{ font-size:44px; display:block; margin-bottom:10px; }
+.choice-card .label{ font-family:'Almarai',sans-serif; font-weight:700; font-size:15px; }
+.choice-card.wide{ width:280px; text-align:right; padding:22px 20px; }
+.choice-card.wide .label{ font-size:14.5px; line-height:1.8; font-weight:500; }
+.choice-card.wide .tag{ font-family:'Almarai',sans-serif; font-weight:800; color:var(--cyan); font-size:13px; margin-bottom:8px; display:block; }
+
+/* ===================== Matter splitting ===================== */
+.matter-stage{
+  min-height:180px; width:100%; max-width:420px; margin:26px auto;
+  display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:10px;
+}
+.matter-piece{
+  border-radius:38% 62% 55% 45% / 45% 40% 60% 55%;
+  background:radial-gradient(circle at 35% 30%, #a8f3ff, var(--cyan) 55%, #1b6d78 100%);
+  box-shadow:0 0 30px var(--cyan-glow);
+  animation:pop .4s ease;
+  flex-shrink:0;
+}
+@keyframes pop{ from{ opacity:0; transform:scale(0.3);} to{ opacity:1; transform:scale(1);} }
+
+/* ===================== Cards (idea 1/2, roadmap, unit) ===================== */
+.card-row{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin:10px 0 22px; }
+.idea-card{
+  width:260px; text-align:right; padding:22px;
+  background:var(--glass); border:1px solid var(--glass-border); border-radius:16px;
+  backdrop-filter:blur(10px);
+}
+.idea-card .tag{ font-family:'Almarai',sans-serif; font-weight:800; color:var(--violet); font-size:13.5px; margin-bottom:10px; display:block; }
+.idea-card p{ font-size:14.5px; line-height:1.85; color:var(--ink-dim); margin:0; }
+
+.atomos-box{
+  margin:20px auto; padding:20px 30px; display:inline-block;
+  border:1px solid rgba(155,140,255,0.4); border-radius:16px;
+  background:rgba(155,140,255,0.08); backdrop-filter:blur(10px);
+  opacity:0; transform:scale(0.8); transition:opacity .6s ease, transform .6s ease;
+}
+.atomos-box.show{ opacity:1; transform:scale(1); }
+.atomos-box .word{ font-family:'Almarai',sans-serif; font-weight:800; font-size:clamp(26px,5vw,38px); color:var(--violet); letter-spacing:2px; text-shadow:0 0 26px var(--violet-glow); }
+.atomos-box .mean{ color:var(--ink-dim); font-size:14px; margin-top:6px; }
+
+/* ===================== Sequence (scene 5) ===================== */
+.sequence{ display:flex; flex-direction:column; align-items:center; gap:6px; margin:14px 0 26px; }
+.seq-item{
+  font-family:'Almarai',sans-serif; font-weight:700; font-size:16px;
+  padding:10px 22px; border-radius:12px; background:var(--glass); border:1px solid var(--glass-border);
+  opacity:0; transform:translateY(10px); transition:opacity .5s ease, transform .5s ease;
+  min-width:170px;
+}
+.seq-item.show{ opacity:1; transform:translateY(0); }
+.seq-arrow{ color:var(--ink-faint); font-size:18px; opacity:0; transition:opacity .4s ease; }
+.seq-arrow.show{ opacity:1; }
+
+/* ===================== Central question chips (scene 6) ===================== */
+.chip-field{ position:relative; width:100%; max-width:560px; height:220px; margin:0 auto 10px; }
+.chip{
+  position:absolute; font-family:'Almarai',sans-serif; font-weight:700; font-size:14px;
+  padding:9px 16px; border-radius:999px; background:var(--glass); border:1px solid var(--glass-border);
+  backdrop-filter:blur(8px); color:var(--ink-dim);
+  opacity:0; animation:chipIn .6s ease forwards;
+}
+@keyframes chipIn{ from{opacity:0; transform:translateY(8px) scale(0.8);} to{opacity:1; transform:translateY(0) scale(1);} }
+.chip.locked{ color:var(--ink-faint); filter:blur(0.4px); }
+.chip .lock{ margin-inline-start:4px; font-size:11px; }
+
+/* ===================== Roadmap (scene 7) ===================== */
+.roadmap{ display:flex; flex-direction:column; gap:14px; width:100%; max-width:420px; margin:10px auto 24px; }
+.road-item{
+  display:flex; align-items:center; gap:14px; padding:16px 18px;
+  background:var(--glass); border:1px solid var(--glass-border); border-radius:16px;
+  backdrop-filter:blur(10px); cursor:pointer; text-align:right; position:relative;
+  transition:border-color .2s ease, transform .2s ease;
+}
+.road-item:hover{ border-color:var(--cyan); transform:translateX(-2px); }
+.road-item .r-emoji{ font-size:24px; flex-shrink:0; }
+.road-item .r-title{ font-family:'Almarai',sans-serif; font-weight:700; font-size:15px; flex:1; }
+.road-item .r-lock{ font-size:14px; color:var(--ink-faint); flex-shrink:0; }
+.road-item .r-msg{
+  font-size:12.5px; color:var(--cyan); margin-top:4px; display:block;
+  opacity:0; max-height:0; overflow:hidden; transition:opacity .4s ease, max-height .4s ease;
+}
+.road-item.opened .r-msg{ opacity:1; max-height:40px; margin-top:6px; }
+.road-item.opened{ border-color:rgba(79,217,232,0.4); }
+
+/* ===================== Final scene ===================== */
+.final-word{
+  font-family:'Almarai',sans-serif; font-weight:800; font-size:clamp(28px,6vw,46px);
+  margin:18px 0; text-shadow:0 0 34px var(--cyan-glow);
+  opacity:0; transform:translateY(8px); transition:opacity .7s ease, transform .7s ease;
+}
+.final-word.show{ opacity:1; transform:translateY(0); }
+.unit-reveal{
+  margin-top:26px; padding:26px 30px; border-radius:18px;
+  background:linear-gradient(135deg, rgba(79,217,232,0.12), rgba(155,140,255,0.12));
+  border:1px solid rgba(79,217,232,0.35);
+  opacity:0; transform:scale(0.9); transition:opacity .6s ease, transform .6s ease;
+}
+.unit-reveal.show{ opacity:1; transform:scale(1); }
+.unit-reveal .u-eyebrow{ color:var(--cyan); font-size:13px; font-family:'Almarai',sans-serif; font-weight:700; margin-bottom:6px; }
+.unit-reveal .u-title{ font-family:'Almarai',sans-serif; font-weight:800; font-size:clamp(20px,4vw,28px); }
+
+/* ===================== Teacher panel ===================== */
+.teacher-panel{
+  position:fixed; top:64px; left:14px; z-index:70;
+  width:260px; max-width:80vw;
+  background:rgba(10,16,28,0.92); border:1px solid var(--glass-border);
+  border-radius:16px; backdrop-filter:blur(14px);
+  padding:16px; box-shadow:0 20px 50px -20px rgba(0,0,0,0.8);
+  transform:translateY(-12px) scale(0.96); opacity:0; pointer-events:none;
+  transition:opacity .25s ease, transform .25s ease;
+}
+.teacher-panel.open{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+.teacher-panel h4{ font-family:'Almarai',sans-serif; font-size:13.5px; margin:0 0 10px; color:var(--cyan); }
+.teacher-info{ font-size:12px; color:var(--ink-dim); line-height:1.9; margin-bottom:10px; }
+.teacher-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:10px; }
+.teacher-grid button{
+  font-size:11.5px; padding:7px 0; border-radius:8px; border:1px solid var(--glass-border);
+  background:rgba(255,255,255,0.04); color:var(--ink-dim); cursor:pointer;
+}
+.teacher-grid button.current{ border-color:var(--cyan); color:var(--cyan); }
+.teacher-panel .btn{ width:100%; padding:9px; font-size:12.5px; }
+
+@media (max-width:520px){
+  .scene{ padding:80px 14px 30px; }
+  .choice-card.wide{ width:100%; }
+  .idea-card{ width:100%; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="top-controls">
+  <div class="points-badge" id="pointsBadge">0 ★</div>
+  <div class="icon-cluster">
+    <button class="icon-btn" id="muteBtn" title="كتم الصوت" onclick="toggleMute()">🔊</button>
+    <button class="icon-btn" id="teacherBtn" title="وضع المعلم" onclick="toggleTeacher()">👨‍🏫</button>
+  </div>
+</div>
+
+<div class="teacher-panel" id="teacherPanel">
+  <h4>وضع المعلم</h4>
+  <div class="teacher-info" id="teacherInfo">المشهد الحالي: 1 من 8<br>عدد التفاعلات: 0</div>
+  <div class="teacher-grid" id="teacherGrid"></div>
+  <button class="btn btn-ghost" onclick="restartGame()">إعادة اللعبة من البداية</button>
+</div>
+
+<div class="stage">
+
+  <!-- Scene 1: البداية -->
+  <section class="scene active" id="scene1" data-scene="1">
+    <div class="scene-inner">
+      <div id="s1-lines">
+        <p class="line" data-d="200">قبل آلاف السنين...</p>
+        <p class="line" data-d="1400">لم تكن هناك مختبرات حديثة.</p>
+        <p class="line" data-d="2400">لم تكن هناك أجهزة تكبير.</p>
+        <p class="line" data-d="3400">لم يكن الإنسان يعرف ما نعرفه اليوم.</p>
+        <p class="line" data-d="4800">لكن كان هناك شيء واحد يمتلكه الإنسان...</p>
+      </div>
+      <div class="big-word" id="s1-bigword">السؤال.</div>
+      <button class="btn btn-primary fade-in-btn" id="s1-btn" onclick="userStart()">ابدأ الرحلة</button>
+    </div>
+  </section>
+
+  <!-- Scene 2: البيضة والدجاجة -->
+  <section class="scene" id="scene2" data-scene="2">
+    <button class="scene-back" onclick="goScene(1)">→ السابق</button>
+    <div class="scene-inner">
+      <span class="eyebrow">سؤال بسيط</span>
+      <h2 class="title-lg">أيهما جاء أولًا؟</h2>
+      <div class="choice-row" id="s2-choices">
+        <div class="choice-card" onclick="pickEgg(this,'egg')">
+          <span class="emoji">🥚</span><span class="label">البيضة</span>
+        </div>
+        <div class="choice-card" onclick="pickEgg(this,'chicken')">
+          <span class="emoji">🐔</span><span class="label">الدجاجة</span>
+        </div>
+      </div>
+      <div id="s2-after" style="margin-top:22px;">
+        <p class="line" id="s2-l1" data-d="100">ربما يكون السؤال أصعب مما يبدو...</p>
+        <p class="line" id="s2-l2" data-d="1300">لكن الإنسان لم يتوقف عند هذه الأسئلة.</p>
+        <button class="btn btn-primary fade-in-btn" id="s2-btn" onclick="goScene(3)">السؤال التالي</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scene 3: قسمة المادة -->
+  <section class="scene" id="scene3" data-scene="3">
+    <button class="scene-back" onclick="goScene(2)">→ السابق</button>
+    <div class="scene-inner">
+      <span class="eyebrow">السؤال الحقيقي</span>
+      <p class="subtitle" style="margin-bottom:6px;">لديك قطعة من المادة.</p>
+      <div class="matter-stage" id="matterStage"></div>
+      <button class="btn btn-primary" id="splitBtn" onclick="splitMatter()">اقسمها</button>
+
+      <div id="s3-question" style="display:none; margin-top:30px;">
+        <p class="line show" style="margin-bottom:4px;">توقف لحظة...</p>
+        <h2 class="title-lg" style="margin-top:14px;">هل يمكننا الاستمرار في تقسيم المادة إلى ما لا نهاية؟</h2>
+        <div class="choice-row" id="s3-choices">
+          <div class="choice-card wide" onclick="pickSplit(this)">
+            <span class="tag">A</span><span class="label">نعم، يمكن تقسيمها دائمًا.</span>
+          </div>
+          <div class="choice-card wide" onclick="pickSplit(this)">
+            <span class="tag">B</span><span class="label">لا بد أن نصل إلى جزء لا يمكن تقسيمه.</span>
+          </div>
+        </div>
+        <div id="s3-after" style="margin-top:22px;">
+          <p class="line" data-d="100">هذا السؤال حيّر البشر لقرون.</p>
+          <p class="line" data-d="1300">وهنا بدأت واحدة من أعمق الرحلات الفكرية في تاريخ العلم.</p>
+          <button class="btn btn-primary fade-in-btn" data-d-btn="2400" onclick="goScene(4)">التالي</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scene 4: الفكرة القديمة -->
+  <section class="scene" id="scene4" data-scene="4">
+    <button class="scene-back" onclick="goScene(3)">→ السابق</button>
+    <div class="scene-inner">
+      <span class="eyebrow">فكرة قديمة جدًا</span>
+      <div class="card-row">
+        <div class="idea-card"><span class="tag">فكرة</span><p>المادة يمكن تقسيمها إلى أجزاء أصغر فأصغر.</p></div>
+        <div class="idea-card"><span class="tag">فكرة أخرى</span><p>لا بد أن نصل في النهاية إلى جزء صغير جدًا لا يمكن تقسيمه.</p></div>
+      </div>
+      <p class="subtitle">اقترح الفيلسوف ديموقريطس فكرة وجود أجزاء صغيرة جدًا من المادة لا يمكن تقسيمها، وأطلق عليها اسمًا يونانيًا قريبًا من معنى: غير قابل للانقسام.</p>
+      <button class="btn btn-ghost" id="atomosBtn" onclick="revealAtomos()">اكشف الاسم</button>
+      <div class="atomos-box" id="atomosBox">
+        <div class="word">ATOMOS</div>
+        <div class="mean">= غير قابل للانقسام</div>
+      </div>
+      <div id="s4-after" style="display:none; margin-top:20px;">
+        <p class="line show" style="color:var(--ink-faint); font-size:14px;">هذه كانت فكرة فلسفية، وليست نتيجة تجربة علمية حديثة.</p>
+        <p class="line show" style="font-weight:700; color:var(--ink);">الفكرة شيء... وإثباتها علميًا شيء آخر.</p>
+        <button class="btn btn-primary fade-in-btn show" onclick="goScene(5)">التالي</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scene 5: من الفكرة إلى العلم -->
+  <section class="scene" id="scene5" data-scene="5">
+    <button class="scene-back" onclick="goScene(4)">→ السابق</button>
+    <div class="scene-inner">
+      <span class="eyebrow">هكذا يعمل العلم</span>
+      <div class="sequence" id="s5-seq">
+        <div class="seq-item">السؤال</div>
+        <div class="seq-arrow">↓</div>
+        <div class="seq-item">الفكرة</div>
+        <div class="seq-arrow">↓</div>
+        <div class="seq-item">الدليل</div>
+        <div class="seq-arrow">↓</div>
+        <div class="seq-item">التجربة</div>
+        <div class="seq-arrow">↓</div>
+        <div class="seq-item">التفسير العلمي</div>
+      </div>
+      <div id="s5-after" style="opacity:0; transition:opacity .6s ease;">
+        <p class="line show">العلم لا يكتفي بأن يسأل...</p>
+        <p class="line show">ولا يكتفي بأن يقترح فكرة...</p>
+        <p class="line show" style="color:var(--ink); font-weight:700;">بل يبحث عن الأدلة.</p>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="goScene(6)">التالي</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scene 6: ممَّ تتكون المادة -->
+  <section class="scene" id="scene6" data-scene="6">
+    <button class="scene-back" onclick="goScene(5)">→ السابق</button>
+    <div class="scene-inner">
+      <h2 class="title-lg" style="font-size:clamp(26px,5.5vw,42px); text-shadow:0 0 30px var(--cyan-glow);">ممَّ تتكوّن المادة؟</h2>
+      <div class="chip-field" id="chipField"></div>
+      <p class="line show">لا تحاول معرفة كل الإجابات الآن.</p>
+      <p class="line show" style="margin-bottom:22px;">خلال هذه الوحدة سنجمع الأدلة خطوةً خطوة.</p>
+      <button class="btn btn-primary" onclick="goScene(7)">التالي</button>
+    </div>
+  </section>
+
+  <!-- Scene 7: خارطة الوحدة -->
+  <section class="scene" id="scene7" data-scene="7">
+    <button class="scene-back" onclick="goScene(6)">→ السابق</button>
+    <div class="scene-inner">
+      <span class="eyebrow">ماذا ينتظرنا؟</span>
+      <h2 class="title-lg">مسار رحلتنا في هذه الوحدة</h2>
+      <div class="roadmap" id="roadmap">
+        <div class="road-item" data-msg="أول دليل في رحلتنا..." onclick="openRoad(this)">
+          <span class="r-emoji">⚡</span>
+          <div style="flex:1;">
+            <span class="r-title">التفريغ الكهربائي</span>
+            <span class="r-msg"></span>
+          </div>
+          <span class="r-lock">🔒</span>
+        </div>
+        <div class="road-item" data-msg="ستكتشف هذا لاحقًا." onclick="openRoad(this)">
+          <span class="r-emoji">⚛️</span>
+          <div style="flex:1;">
+            <span class="r-title">مكونات الذرّة</span>
+            <span class="r-msg"></span>
+          </div>
+          <span class="r-lock">🔒</span>
+        </div>
+        <div class="road-item" data-msg="ستكتشف هذا لاحقًا." onclick="openRoad(this)">
+          <span class="r-emoji">🌀</span>
+          <div style="flex:1;">
+            <span class="r-title">التوزيع الإلكتروني</span>
+            <span class="r-msg"></span>
+          </div>
+          <span class="r-lock">🔒</span>
+        </div>
+        <div class="road-item" data-msg="ستكتشف هذا لاحقًا." onclick="openRoad(this)">
+          <span class="r-emoji">🧩</span>
+          <div style="flex:1;">
+            <span class="r-title">الجدول الدوري</span>
+            <span class="r-msg"></span>
+          </div>
+          <span class="r-lock">🔒</span>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="s7-btn" onclick="goScene(8)" disabled>التالي</button>
+    </div>
+  </section>
+
+  <!-- Scene 8: النهاية -->
+  <section class="scene" id="scene8" data-scene="8">
+    <button class="scene-back" onclick="goScene(7)">→ السابق</button>
+    <div class="scene-inner" id="s8-content">
+      <div id="s8-lines">
+        <p class="line" data-d="150">هل عرفت الإجابة؟</p>
+        <p class="line" data-d="1300">ليس بعد...</p>
+        <p class="line" data-d="2450" style="color:var(--ink); font-weight:700;">وهذا هو الهدف.</p>
+      </div>
+      <div class="final-word" id="s8-big1">العلم يبدأ بسؤال.</div>
+      <p class="line" id="s8-l2" style="margin-top:8px;">والسؤال الصحيح يمكن أن يغيّر طريقة فهمنا للعالم.</p>
+      <div class="final-word" id="s8-big2" style="font-size:clamp(22px,4.5vw,32px);">مرحبًا بكم في رحلة الذرة ⚛️</div>
+      <button class="btn btn-primary fade-in-btn" id="s8-btn" onclick="revealUnit()">ابدأ الوحدة</button>
+
+      <div class="unit-reveal" id="unitReveal">
+        <div class="u-eyebrow">الوحدة الأولى</div>
+        <div class="u-title">بنية الذرّة ⚛️</div>
+      </div>
+      <div id="s8-restart" style="margin-top:26px; display:none;">
+        <button class="btn btn-ghost" onclick="restartGame()">إعادة اللعبة</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ============================================================
+   الحالة العامة State
+   ============================================================ */
+const totalScenes = 8;
+let currentScene = 1;
+let points = 0;
+let interactions = 0;
+let muted = false;
+let audioCtx = null;
+
+/* ============================================================
+   الصوت — Web Audio API فقط، بدون ملفات
+   ============================================================ */
+function ensureAudio(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e){ audioCtx = null; }
+  }
+  if(audioCtx && audioCtx.state === 'suspended'){ audioCtx.resume(); }
+}
+function tone(freq, duration, type, gainVal, delay){
+  if(muted || !audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type || 'sine';
+  osc.frequency.value = freq;
+  const t0 = audioCtx.currentTime + (delay||0);
+  gain.gain.setValueAtTime(gainVal||0.1, t0);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0 + duration);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(t0); osc.stop(t0 + duration + 0.05);
+}
+function playClick(){ ensureAudio(); tone(520,0.09,'square',0.06,0); }
+function playSuccess(){ ensureAudio(); tone(620,0.12,'sine',0.09,0); tone(880,0.16,'sine',0.09,0.09); }
+function playReveal(){ ensureAudio(); tone(340,0.5,'sine',0.06,0); }
+function playTransition(){ ensureAudio(); tone(200,0.3,'sine',0.05,0); }
+
+function toggleMute(){
+  muted = !muted;
+  document.getElementById('muteBtn').textContent = muted ? '🔇' : '🔊';
+  playClick();
+}
+
+/* ============================================================
+   النقاط
+   ============================================================ */
+function addPoints(n){
+  points += n;
+  interactions += 1;
+  const badge = document.getElementById('pointsBadge');
+  badge.textContent = points + ' ★';
+  badge.classList.add('pulse');
+  setTimeout(()=>badge.classList.remove('pulse'), 260);
+  updateTeacherInfo();
+}
+
+/* ============================================================
+   التنقل بين المشاهد
+   ============================================================ */
+function goScene(n){
+  playTransition();
+  document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
+  document.getElementById('scene'+n).classList.add('active');
+  currentScene = n;
+  document.getElementById('progressFill').style.width = ((n-1)/(totalScenes-1)*100) + '%';
+  updateTeacherInfo();
+  runSceneEnter(n);
+}
+
+function runSceneEnter(n){
+  if(n===1) runScene1();
+  if(n===2) runScene2Reset();
+  if(n===5) runScene5();
+  if(n===6) runScene6();
+}
+
+/* ============================================================
+   المشهد 1 — البداية
+   ============================================================ */
+function runScene1(){
+  document.querySelectorAll('#s1-lines .line').forEach(el=>{
+    el.classList.remove('show');
+    const d = parseInt(el.getAttribute('data-d'));
+    setTimeout(()=>el.classList.add('show'), d);
+  });
+  document.getElementById('s1-bigword').classList.remove('show');
+  setTimeout(()=>document.getElementById('s1-bigword').classList.add('show'), 6000);
+  document.getElementById('s1-btn').classList.remove('show');
+  setTimeout(()=>document.getElementById('s1-btn').classList.add('show'), 6600);
+}
+function userStart(){
+  ensureAudio();
+  playClick();
+  goScene(2);
+}
+runScene1();
+
+/* ============================================================
+   المشهد 2 — البيضة والدجاجة
+   ============================================================ */
+function runScene2Reset(){
+  document.getElementById('s2-choices').style.display='flex';
+  document.querySelectorAll('#scene2 .choice-card').forEach(c=>c.classList.remove('chosen'));
+  document.getElementById('s2-after').style.display='none';
+  document.getElementById('s2-l1').classList.remove('show');
+  document.getElementById('s2-l2').classList.remove('show');
+  document.getElementById('s2-btn').classList.remove('show');
+}
+function pickEgg(el, val){
+  playClick();
+  document.querySelectorAll('#scene2 .choice-card').forEach(c=>c.classList.remove('chosen'));
+  el.classList.add('chosen');
+  addPoints(1);
+  document.getElementById('s2-after').style.display='block';
+  setTimeout(()=>document.getElementById('s2-l1').classList.add('show'), 150);
+  setTimeout(()=>document.getElementById('s2-l2').classList.add('show'), 1350);
+  setTimeout(()=>document.getElementById('s2-btn').classList.add('show'), 2450);
+}
+
+/* ============================================================
+   المشهد 3 — قسمة المادة
+   ============================================================ */
+let splitCount = 0;
+const splitLabels = ['اقسمها','اقسمها مرة أخرى','مرة أخرى','ومرة أخرى...'];
+function renderMatter(){
+  const stage = document.getElementById('matterStage');
+  stage.innerHTML = '';
+  const pieces = Math.pow(2, splitCount);
+  const size = Math.max(140/Math.sqrt(pieces), 20);
+  for(let i=0;i<pieces;i++){
+    const d = document.createElement('div');
+    d.className='matter-piece';
+    d.style.width = size+'px';
+    d.style.height = size+'px';
+    d.style.animationDelay = (i*0.03)+'s';
+    stage.appendChild(d);
+  }
+}
+renderMatter();
+function splitMatter(){
+  playClick();
+  splitCount++;
+  addPoints(1);
+  renderMatter();
+  const btn = document.getElementById('splitBtn');
+  if(splitCount < splitLabels.length){
+    btn.textContent = splitLabels[splitCount] || 'ومرة أخرى...';
+  }
+  if(splitCount >= 4){
+    btn.style.display='none';
+    setTimeout(()=>{
+      document.getElementById('s3-question').style.display='block';
+    }, 500);
+  }
+}
+function pickSplit(el){
+  playClick();
+  document.querySelectorAll('#s3-choices .choice-card').forEach(c=>c.classList.remove('chosen'));
+  el.classList.add('chosen');
+  addPoints(1);
+  const after = document.getElementById('s3-after');
+  after.querySelectorAll('.line').forEach(line=>{
+    const d = parseInt(line.getAttribute('data-d'));
+    setTimeout(()=>line.classList.add('show'), d);
+  });
+  const btn = after.querySelector('.btn');
+  const bd = parseInt(btn.getAttribute('data-d-btn'));
+  setTimeout(()=>btn.classList.add('show'), bd);
+}
+
+/* ============================================================
+   المشهد 4 — ديموقريطس / أتوموس
+   ============================================================ */
+function revealAtomos(){
+  playReveal();
+  document.getElementById('atomosBox').classList.add('show');
+  document.getElementById('atomosBtn').style.display='none';
+  addPoints(1);
+  setTimeout(()=>{
+    document.getElementById('s4-after').style.display='block';
+  }, 500);
+}
+
+/* ============================================================
+   المشهد 5 — تسلسل السؤال إلى العلم
+   ============================================================ */
+function runScene5(){
+  const items = document.querySelectorAll('#s5-seq .seq-item, #s5-seq .seq-arrow');
+  items.forEach((el,i)=>{
+    el.classList.remove('show');
+    setTimeout(()=>el.classList.add('show'), 250*i + 100);
+  });
+  const after = document.getElementById('s5-after');
+  after.style.opacity = 0;
+  setTimeout(()=>{ after.style.opacity = 1; }, 250*items.length + 400);
+}
+
+/* ============================================================
+   المشهد 6 — كلمات حول السؤال المركزي
+   ============================================================ */
+const chipData = [
+  {t:'المادة', locked:false},
+  {t:'الذرّة', locked:true},
+  {t:'الكهرباء', locked:false},
+  {t:'الإلكترونات', locked:true},
+  {t:'العناصر', locked:false},
+  {t:'الجدول الدوري', locked:true}
+];
+const chipPositions = [
+  {top:'6%', left:'4%'}, {top:'2%', left:'62%'},
+  {top:'42%', left:'0%'}, {top:'40%', left:'70%'},
+  {top:'80%', left:'10%'}, {top:'78%', left:'56%'}
+];
+function runScene6(){
+  const field = document.getElementById('chipField');
+  field.innerHTML = '';
+  chipData.forEach((c,i)=>{
+    const el = document.createElement('div');
+    el.className = 'chip' + (c.locked ? ' locked' : '');
+    el.style.top = chipPositions[i].top;
+    el.style.left = chipPositions[i].left;
+    el.style.animationDelay = (i*0.15)+'s';
+    el.innerHTML = c.t + (c.locked ? ' <span class="lock">🔒</span>' : '');
+    field.appendChild(el);
+  });
+}
+
+/* ============================================================
+   المشهد 7 — خارطة الوحدة
+   ============================================================ */
+function openRoad(el){
+  playReveal();
+  if(!el.classList.contains('opened')){
+    addPoints(1);
+  }
+  el.classList.add('opened');
+  el.querySelector('.r-msg').textContent = el.getAttribute('data-msg');
+  document.getElementById('s7-btn').disabled = false;
+}
+
+/* ============================================================
+   المشهد 8 — الختام
+   ============================================================ */
+function runScene8Enter(){
+  document.querySelectorAll('#s8-lines .line').forEach(el=>{
+    el.classList.remove('show');
+    const d = parseInt(el.getAttribute('data-d'));
+    setTimeout(()=>el.classList.add('show'), d);
+  });
+  document.getElementById('s8-big1').classList.remove('show');
+  document.getElementById('s8-l2').classList.remove('show');
+  document.getElementById('s8-big2').classList.remove('show');
+  document.getElementById('s8-btn').classList.remove('show');
+  setTimeout(()=>document.getElementById('s8-big1').classList.add('show'), 3600);
+  setTimeout(()=>document.getElementById('s8-l2').classList.add('show'), 4400);
+  setTimeout(()=>document.getElementById('s8-big2').classList.add('show'), 5400);
+  setTimeout(()=>document.getElementById('s8-btn').classList.add('show'), 6200);
+}
+function revealUnit(){
+  playSuccess();
+  addPoints(2);
+  document.getElementById('unitReveal').classList.add('show');
+  document.getElementById('s8-btn').style.display='none';
+  document.getElementById('s8-restart').style.display='block';
+}
+const origRunSceneEnter = runSceneEnter;
+runSceneEnter = function(n){
+  origRunSceneEnter(n);
+  if(n===8) runScene8Enter();
+};
+
+/* ============================================================
+   إعادة اللعبة
+   ============================================================ */
+function restartGame(){
+  playClick();
+  points = 0; interactions = 0; splitCount = 0;
+  document.getElementById('pointsBadge').textContent = '0 ★';
+  document.querySelectorAll('.choice-card').forEach(c=>c.classList.remove('chosen'));
+  document.getElementById('s3-question').style.display='none';
+  document.getElementById('splitBtn').style.display='inline-block';
+  document.getElementById('splitBtn').textContent = 'اقسمها';
+  renderMatter();
+  document.getElementById('atomosBox').classList.remove('show');
+  document.getElementById('atomosBtn').style.display='inline-block';
+  document.getElementById('s4-after').style.display='none';
+  document.querySelectorAll('.road-item').forEach(r=>{ r.classList.remove('opened'); r.querySelector('.r-msg').textContent=''; });
+  document.getElementById('s7-btn').disabled = true;
+  document.getElementById('unitReveal').classList.remove('show');
+  document.getElementById('s8-btn').style.display='inline-block';
+  document.getElementById('s8-restart').style.display='none';
+  toggleTeacher(true);
+  goScene(1);
+}
+
+/* ============================================================
+   وضع المعلم
+   ============================================================ */
+function buildTeacherGrid(){
+  const grid = document.getElementById('teacherGrid');
+  grid.innerHTML = '';
+  for(let i=1;i<=totalScenes;i++){
+    const b = document.createElement('button');
+    b.textContent = i;
+    b.className = (i===currentScene) ? 'current' : '';
+    b.onclick = ()=>{ goScene(i); buildTeacherGrid(); };
+    grid.appendChild(b);
+  }
+}
+function updateTeacherInfo(){
+  document.getElementById('teacherInfo').innerHTML =
+    'المشهد الحالي: '+currentScene+' من '+totalScenes+'<br>عدد التفاعلات: '+interactions+' — النقاط: '+points;
+  buildTeacherGrid();
+}
+function toggleTeacher(forceClose){
+  const panel = document.getElementById('teacherPanel');
+  if(forceClose){ panel.classList.remove('open'); return; }
+  panel.classList.toggle('open');
+  updateTeacherInfo();
+}
+updateTeacherInfo();
+
+/* ============================================================
+   خلفية الجسيمات — Canvas خفيف
+   ============================================================ */
+(function particles(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w, h, dots = [];
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  function init(){
+    resize();
+    const count = Math.min(46, Math.floor((w*h)/26000));
+    dots = Array.from({length:count}, ()=>({
+      x: Math.random()*w, y: Math.random()*h,
+      vx: (Math.random()-0.5)*0.18, vy:(Math.random()-0.5)*0.18,
+      r: Math.random()*1.6+0.6,
+      hue: Math.random() > 0.5 ? '79,217,232' : '155,140,255'
+    }));
+  }
+  function tick(){
+    ctx.clearRect(0,0,w,h);
+    dots.forEach(d=>{
+      d.x += d.vx; d.y += d.vy;
+      if(d.x<0) d.x=w; if(d.x>w) d.x=0;
+      if(d.y<0) d.y=h; if(d.y>h) d.y=0;
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba('+d.hue+',0.55)';
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI*2);
+      ctx.fill();
+    });
+    requestAnimationFrame(tick);
+  }
+  window.addEventListener('resize', resize);
+  init();
+  tick();
+})();
+</script>
+</body>
+</html>
