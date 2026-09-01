@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ملف القضية: الذرة الغامضة</title>
+<style>
+/* ============================================================
+   Design tokens — بدون أي خطوط أو موارد خارجية
+   ============================================================ */
+:root{
+  --bg-0:#070a10;
+  --bg-1:#0d121c;
+  --glass:rgba(255,255,255,0.045);
+  --glass-2:rgba(255,255,255,0.07);
+  --glass-border:rgba(255,255,255,0.1);
+  --line:rgba(120,190,255,0.16);
+  --cyan:#4fd9e8;
+  --cyan-glow:rgba(79,217,232,0.5);
+  --red:#ff5b6a;
+  --red-glow:rgba(255,91,106,0.45);
+  --gold:#f2b705;
+  --gold-glow:rgba(242,183,5,0.4);
+  --green:#5fe08a;
+  --violet:#9b8cff;
+  --ink:#eef2f7;
+  --ink-dim:#9fb0c6;
+  --ink-faint:#5e6b80;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;height:100%;overflow-x:hidden;}
+body{
+  background:
+    radial-gradient(circle at 15% 8%, rgba(79,217,232,0.08), transparent 42%),
+    radial-gradient(circle at 85% 90%, rgba(255,91,106,0.07), transparent 45%),
+    var(--bg-0);
+  color:var(--ink);
+  font-family:'Tahoma','Segoe UI',Arial,sans-serif;
+  min-height:100vh; position:relative;
+}
+h1,h2,h3,.display{ font-weight:800; letter-spacing:0.2px; }
+button{ font-family:inherit; }
+
+/* ============================================================ Stage & particles ============================================================ */
+#particles{ position:fixed; inset:0; z-index:0; opacity:0.5; pointer-events:none; }
+.app{ position:relative; z-index:1; min-height:100vh; }
+
+/* ============================================================ Top bar ============================================================ */
+.top-controls{
+  position:fixed; top:12px; left:12px; right:12px; z-index:80;
+  display:flex; align-items:center; justify-content:space-between;
+  pointer-events:none;
+}
+.top-controls > *{ pointer-events:auto; }
+.icon-cluster{ display:flex; gap:8px; }
+.icon-btn{
+  width:38px; height:38px; border-radius:11px;
+  background:var(--glass); border:1px solid var(--glass-border);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  color:var(--ink-dim); font-size:16px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s ease; opacity:0.8;
+}
+.icon-btn:hover{ opacity:1; border-color:var(--cyan); color:var(--cyan); }
+.score-badge{
+  font-weight:800; font-size:13px;
+  background:var(--glass); border:1px solid var(--glass-border);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  padding:8px 14px; border-radius:999px; color:var(--gold);
+  display:flex; align-items:center; gap:6px; transition:transform .25s ease;
+}
+.score-badge.pulse{ transform:scale(1.14); }
+
+/* ============================================================ Progress bar ============================================================ */
+.progress-wrap{ position:fixed; top:0; left:0; right:0; height:4px; z-index:90; background:rgba(255,255,255,0.05); }
+.progress-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--red),var(--gold)); box-shadow:0 0 12px 2px var(--red-glow); transition:width .6s ease; }
+
+/* ============================================================ Screens ============================================================ */
+.screen{
+  position:absolute; inset:0; min-height:100vh;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:90px 18px 50px; opacity:0; transform:scale(0.97) translateY(8px);
+  pointer-events:none; transition:opacity .5s ease, transform .5s ease; text-align:center;
+}
+.screen.active{ position:relative; opacity:1; transform:scale(1) translateY(0); pointer-events:auto; }
+.screen-inner{ width:100%; max-width:820px; margin:0 auto; }
+
+.eyebrow{
+  font-weight:800; font-size:12.5px; color:var(--red); letter-spacing:0.5px;
+  background:rgba(255,91,106,0.1); border:1px solid rgba(255,91,106,0.3);
+  padding:5px 14px; border-radius:999px; display:inline-block; margin-bottom:18px;
+}
+.eyebrow.cyan{ color:var(--cyan); background:rgba(79,217,232,0.1); border-color:rgba(79,217,232,0.3); }
+.eyebrow.gold{ color:var(--gold); background:rgba(242,183,5,0.1); border-color:rgba(242,183,5,0.3); }
+
+.title-lg{ font-size:clamp(24px,4.6vw,34px); line-height:1.5; margin:0 0 14px; }
+.subtitle{ color:var(--ink-dim); font-size:clamp(14px,2.3vw,16px); line-height:1.9; margin-bottom:24px; }
+.case-desc{ color:var(--ink-dim); font-size:14.5px; line-height:1.9; max-width:600px; margin:0 auto 22px; }
+
+/* ============================================================ Buttons ============================================================ */
+.btn{
+  font-weight:800; font-size:15.5px; border:none; border-radius:14px; padding:15px 28px;
+  cursor:pointer; transition:transform .15s ease, box-shadow .2s ease, opacity .2s ease;
+}
+.btn:active{ transform:scale(0.96); }
+.btn:disabled{ opacity:0.4; cursor:not-allowed; }
+.btn-primary{ background:linear-gradient(135deg,var(--red),#ff8a7a); color:#2a0a0a; box-shadow:0 10px 26px -10px var(--red-glow); }
+.btn-primary:not(:disabled):hover{ box-shadow:0 14px 32px -8px var(--red-glow); }
+.btn-cyan{ background:linear-gradient(135deg,var(--cyan),#8ff3ff); color:#03222a; box-shadow:0 10px 26px -10px var(--cyan-glow); }
+.btn-ghost{ background:var(--glass); border:1px solid var(--glass-border); color:var(--ink); backdrop-filter:blur(8px); }
+.btn-ghost:hover{ border-color:var(--cyan); color:var(--cyan); }
+
+/* ============================================================ Intro ============================================================ */
+.case-badge-hero{ font-size:56px; margin-bottom:10px; }
+.tagline{ color:var(--gold); font-weight:700; font-size:15px; margin:10px 0 22px; }
+.story-box{
+  background:var(--glass); border:1px solid var(--glass-border); border-radius:18px;
+  padding:24px 26px; margin-bottom:26px; backdrop-filter:blur(10px);
+  font-size:15px; line-height:2; color:var(--ink-dim); text-align:right;
+}
+
+/* ============================================================ Case shell ============================================================ */
+.case-header{ display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:6px; }
+.case-num{
+  width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:14px; background:var(--gold); color:#2a1c00; flex-shrink:0;
+}
+
+/* ============================================================ Case 1 — Drag & Drop ============================================================ */
+.zones-row{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin:18px 0 22px; }
+.drop-zone{
+  width:220px; min-height:160px; border-radius:16px; padding:14px;
+  background:var(--glass); border:2px dashed var(--glass-border);
+  transition:border-color .2s ease, background .2s ease;
+}
+.drop-zone.hover-zone{ border-color:var(--cyan); background:rgba(79,217,232,0.08); }
+.drop-zone .z-head{ display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.drop-zone .z-emoji{ font-size:20px; }
+.drop-zone .z-name{ font-weight:800; font-size:14px; }
+.zone-items{ display:flex; flex-direction:column; gap:8px; min-height:20px; }
+.zone-items .drag-chip.placed{ font-size:12px; padding:8px 10px; background:rgba(95,224,138,0.14); border-color:rgba(95,224,138,0.5); cursor:default; }
+
+.chip-tray{
+  display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
+  max-width:640px; margin:0 auto 10px; padding:16px;
+  background:var(--glass); border:1px solid var(--glass-border); border-radius:16px;
+}
+.drag-chip{
+  font-size:13px; font-weight:600; line-height:1.6; padding:12px 14px; border-radius:12px;
+  background:var(--glass-2); border:1px solid var(--glass-border); color:var(--ink);
+  cursor:grab; touch-action:none; user-select:none; max-width:220px;
+  transition:box-shadow .15s ease, border-color .15s ease;
+}
+.drag-chip.dragging{ box-shadow:0 18px 34px -12px rgba(0,0,0,0.6); cursor:grabbing; opacity:0.95; }
+.drag-chip.shake{ animation:shakeErr .4s ease; border-color:var(--red); }
+@keyframes shakeErr{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+
+/* ============================================================ MCQ ============================================================ */
+.mcq-group{ display:flex; flex-direction:column; gap:10px; max-width:520px; margin:0 auto 24px; }
+.mcq-group.locked .mcq-btn:not(.correct-choice){ opacity:0.45; }
+.mcq-btn{
+  text-align:right; padding:14px 18px; border-radius:12px; font-size:14.5px; font-weight:600;
+  background:var(--glass); border:1px solid var(--glass-border); color:var(--ink); cursor:pointer;
+  transition:all .18s ease;
+}
+.mcq-btn:hover:not(:disabled){ border-color:var(--cyan); }
+.mcq-btn.correct-choice{ border-color:var(--green); background:rgba(95,224,138,0.14); color:var(--green); }
+.mcq-btn.wrong-choice{ border-color:var(--red); background:rgba(255,91,106,0.14); color:var(--red); }
+.q-label{ font-weight:700; font-size:15px; margin:20px 0 12px; }
+
+/* ============================================================ Case 2 — tube ============================================================ */
+.tube-wrap{ margin:10px auto 20px; max-width:420px; }
+.beam-line{ stroke:url(#beamGrad); stroke-width:4; filter:drop-shadow(0 0 6px var(--cyan)); animation:beamPulse 1.6s ease-in-out infinite; }
+@keyframes beamPulse{ 0%,100%{opacity:0.6;} 50%{opacity:1;} }
+
+/* ============================================================ Case 3 — model + multiselect ============================================================ */
+.select-chips{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:520px; margin:0 auto 18px; }
+.sel-chip{
+  padding:11px 16px; border-radius:999px; font-size:13.5px; font-weight:700; cursor:pointer;
+  background:var(--glass); border:1px solid var(--glass-border); color:var(--ink-dim); transition:all .18s ease;
+}
+.sel-chip.selected{ border-color:var(--cyan); color:var(--cyan); background:rgba(79,217,232,0.1); }
+.sel-chip.correct-mark{ border-color:var(--green); color:var(--green); background:rgba(95,224,138,0.14); }
+.sel-chip.wrong-mark{ border-color:var(--red); color:var(--red); background:rgba(255,91,106,0.14); }
+
+/* ============================================================ Case 4 — Rutherford ============================================================ */
+.canvas-wrap{ position:relative; max-width:560px; margin:10px auto 18px; border-radius:16px; overflow:hidden; border:1px solid var(--glass-border); background:#04070c; }
+#rutherfordCanvas{ display:block; width:100%; height:auto; }
+.canvas-caption{ font-size:12px; color:var(--ink-faint); margin-top:6px; }
+.observe-block{ opacity:0; max-height:0; overflow:hidden; transition:opacity .5s ease; }
+.observe-block.show{ opacity:1; max-height:2000px; }
+
+/* ============================================================ Case 5 — evidence ============================================================ */
+.evidence-grid{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; max-width:640px; margin:0 auto 24px; }
+.evidence-card{
+  width:260px; text-align:right; padding:16px 18px; border-radius:14px;
+  background:var(--glass); border:1px solid var(--glass-border);
+}
+.evidence-card .e-tag{ font-weight:800; color:var(--gold); font-size:12.5px; margin-bottom:6px; display:block; }
+.evidence-card p{ margin:0; font-size:13.5px; line-height:1.8; color:var(--ink-dim); }
+
+/* ============================================================ Case complete toast ============================================================ */
+.case-toast{
+  display:inline-flex; align-items:center; gap:8px; margin:16px auto 0; padding:12px 20px;
+  border-radius:12px; background:rgba(95,224,138,0.12); border:1px solid rgba(95,224,138,0.4);
+  color:var(--green); font-weight:700; font-size:14px;
+  opacity:0; transform:translateY(8px); transition:opacity .4s ease, transform .4s ease;
+}
+.case-toast.show{ opacity:1; transform:translateY(0); }
+.bonus-tag{ color:var(--gold); font-weight:800; margin-inline-start:6px; }
+
+/* ============================================================ Result ============================================================ */
+.badge-hero{ font-size:72px; margin-bottom:8px; }
+.badge-title{ font-size:clamp(22px,4.5vw,32px); font-weight:800; margin-bottom:6px; }
+.badge-score{ font-size:15px; color:var(--gold); font-weight:800; margin-bottom:20px; }
+.encourage-box{
+  background:var(--glass); border:1px solid var(--glass-border); border-radius:16px;
+  padding:20px 22px; max-width:520px; margin:0 auto 20px; color:var(--ink-dim); font-size:14.5px; line-height:1.9;
+}
+.locked-next{
+  margin-top:8px; padding:16px 20px; border-radius:14px; max-width:460px; margin-left:auto; margin-right:auto;
+  background:rgba(255,91,106,0.08); border:1px solid rgba(255,91,106,0.3); color:var(--ink-dim); font-size:13.5px; line-height:1.8;
+}
+
+/* ============================================================ Closing sequence ============================================================ */
+.line{ font-size:15.5px; line-height:2; color:var(--ink-dim); opacity:0; transform:translateY(8px); transition:opacity .6s ease, transform .6s ease; margin:4px 0; }
+.line.show{ opacity:1; transform:translateY(0); }
+.final-q{
+  margin:22px auto; padding:20px 24px; max-width:520px; border-radius:16px;
+  background:linear-gradient(135deg, rgba(155,140,255,0.12), rgba(79,217,232,0.1));
+  border:1px solid rgba(155,140,255,0.35); font-weight:700; font-size:15.5px; line-height:1.9;
+  opacity:0; transform:scale(0.92); transition:opacity .6s ease, transform .6s ease;
+}
+.final-q.show{ opacity:1; transform:scale(1); }
+
+/* ============================================================ Teacher panel ============================================================ */
+.teacher-panel{
+  position:fixed; top:60px; left:12px; z-index:95; width:270px; max-width:82vw;
+  background:rgba(8,12,20,0.94); border:1px solid var(--glass-border); border-radius:16px;
+  backdrop-filter:blur(14px); padding:16px; box-shadow:0 20px 50px -20px rgba(0,0,0,0.85);
+  transform:translateY(-12px) scale(0.96); opacity:0; pointer-events:none; transition:all .25s ease;
+}
+.teacher-panel.open{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+.teacher-panel h4{ font-size:13.5px; margin:0 0 10px; color:var(--red); }
+.t-row{ display:flex; justify-content:space-between; font-size:12.5px; color:var(--ink-dim); padding:5px 0; border-bottom:1px dashed var(--glass-border); }
+.t-row b{ color:var(--ink); }
+.teacher-panel .btn{ width:100%; padding:9px; font-size:12.5px; margin-top:10px; }
+
+/* ============================================================ Toast (wrong drop) ============================================================ */
+#floatToast{
+  position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px); z-index:200;
+  background:rgba(255,91,106,0.16); border:1px solid var(--red); color:#ffd7d9;
+  padding:10px 20px; border-radius:999px; font-size:13px; font-weight:700; opacity:0;
+  transition:opacity .3s ease, transform .3s ease; pointer-events:none;
+}
+#floatToast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+@media (max-width:520px){
+  .screen{ padding:80px 12px 40px; }
+  .drop-zone{ width:100%; max-width:280px; }
+  .evidence-card{ width:100%; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="top-controls">
+  <div class="score-badge" id="scoreBadge">0 نقطة</div>
+  <div class="icon-cluster">
+    <button class="icon-btn" id="muteBtn" title="كتم الصوت" onclick="toggleMute()">🔊</button>
+    <button class="icon-btn" id="teacherBtn" title="وضع المعلم" onclick="toggleTeacher()">👨‍🏫</button>
+  </div>
+</div>
+
+<div class="teacher-panel" id="teacherPanel">
+  <h4>👨‍🏫 وضع المعلم</h4>
+  <div class="t-row"><span>عدد القضايا</span><b>5</b></div>
+  <div class="t-row"><span>الإجابات الصحيحة</span><b id="tCorrect">0</b></div>
+  <div class="t-row"><span>الإجابات الخاطئة</span><b id="tWrong">0</b></div>
+  <div class="t-row"><span>النتيجة النهائية</span><b id="tScore">0</b></div>
+  <div class="t-row"><span>نسبة الإتقان</span><b id="tMastery">—</b></div>
+  <button class="btn btn-ghost" onclick="restartGame()">🔄 إعادة المحاولة</button>
+</div>
+
+<div id="floatToast"></div>
+
+<div class="app">
+
+  <!-- ============ شاشة البداية ============ -->
+  <section class="screen active" id="screen-intro">
+    <div class="screen-inner">
+      <div class="case-badge-hero">🔬</div>
+      <h1 class="title-lg">ملف القضية: الذرة الغامضة</h1>
+      <p class="tagline">"لقد سمعت القصة… الآن أثبت أنك فهمتها."</p>
+      <div class="story-box">
+        انتهى العلماء من جمع الأدلة حول الذرّة، لكن ملف القضية ما زال مفتوحًا.<br><br>
+        أنت الآن <b>المحقق العلمي</b>.<br>
+        أمامك مجموعة من الأدلة والأسئلة والتجارب.<br><br>
+        هل تستطيع إعادة بناء قصة اكتشاف مكوّنات الذرّة؟
+      </div>
+      <button class="btn btn-primary" onclick="startInvestigation()">🚀 ابدأ التحقيق</button>
+    </div>
+  </section>
+
+  <!-- ============ القضية 1 ============ -->
+  <section class="screen" id="screen-case1">
+    <div class="screen-inner">
+      <div class="case-header"><div class="case-num">1</div><span class="eyebrow">من كان يظن ماذا؟</span></div>
+      <h2 class="title-lg">اسحب كل فكرة إلى العالم المناسب</h2>
+      <p class="case-desc">راجع أفكار العلماء الثلاثة عن الذرّة، وضع كل فكرة في مكانها الصحيح.</p>
+
+      <div class="zones-row" id="zonesRow">
+        <div class="drop-zone" data-key="dalton">
+          <div class="z-head"><span class="z-emoji">🔵</span><span class="z-name">دالتون</span></div>
+          <div class="zone-items" id="zone-dalton"></div>
+        </div>
+        <div class="drop-zone" data-key="thomson">
+          <div class="z-head"><span class="z-emoji">🟣</span><span class="z-name">ثومسون</span></div>
+          <div class="zone-items" id="zone-thomson"></div>
+        </div>
+        <div class="drop-zone" data-key="rutherford">
+          <div class="z-head"><span class="z-emoji">🟠</span><span class="z-name">رذرفورد</span></div>
+          <div class="zone-items" id="zone-rutherford"></div>
+        </div>
+      </div>
+
+      <div class="chip-tray" id="chipTray"></div>
+
+      <div class="case-toast" id="toast-case1">✓ اكتملت القضية الأولى <span class="bonus-tag" id="bonus-case1"></span></div>
+      <div style="margin-top:18px;">
+        <button class="btn btn-primary" id="next-case1" onclick="goCase(2)" disabled>القضية التالية</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ القضية 2 ============ -->
+  <section class="screen" id="screen-case2">
+    <div class="screen-inner">
+      <div class="case-header"><div class="case-num">2</div><span class="eyebrow cyan">الدليل الكهربائي ⚡</span></div>
+      <h2 class="title-lg">أنبوب التفريغ الكهربائي</h2>
+
+      <div class="tube-wrap">
+        <svg viewBox="0 0 400 130" width="100%">
+          <defs>
+            <linearGradient id="tubeGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#1a2333"/><stop offset="1" stop-color="#0d121c"/>
+            </linearGradient>
+            <linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#4fd9e8"/><stop offset="1" stop-color="#a8f3ff"/>
+            </linearGradient>
+          </defs>
+          <rect x="20" y="30" width="360" height="70" rx="35" fill="url(#tubeGrad)" stroke="#2a3852" stroke-width="2"/>
+          <rect x="10" y="45" width="26" height="40" rx="4" fill="#3a4a63"/>
+          <text x="23" y="102" fill="#9fb0c6" font-size="11" text-anchor="middle">−</text>
+          <rect x="364" y="45" width="26" height="40" rx="4" fill="#3a4a63"/>
+          <text x="377" y="102" fill="#9fb0c6" font-size="11" text-anchor="middle">+</text>
+          <line class="beam-line" x1="45" y1="65" x2="360" y2="65"/>
+          <path d="M45,65 Q200,40 355,50" fill="none" stroke="#f2b705" stroke-width="2" stroke-dasharray="4 4" opacity="0.55"/>
+          <text x="200" y="24" fill="#f2b705" font-size="11" text-anchor="middle">مسار الشعاع عند تأثير مجال مغناطيسي</text>
+        </svg>
+      </div>
+      <p class="case-desc">لاحظ العلماء شعاعًا داخل أنبوب التفريغ، ولاحظوا انحرافه عند التأثير بالمجالات.</p>
+
+      <div class="q-label">ماذا نستنتج من انحراف الشعاع؟</div>
+      <div class="mcq-group" id="c2q1">
+        <button class="mcq-btn" data-correct="true" onclick="mcqClick(this,'c2q1', afterC2Q1)">أنه يتكوّن من جسيمات مشحونة</button>
+        <button class="mcq-btn" onclick="mcqClick(this,'c2q1', afterC2Q1)">أنه غير متأثر بالمجالات</button>
+        <button class="mcq-btn" onclick="mcqClick(this,'c2q1', afterC2Q1)">أنه يتكوّن من جسيمات متعادلة</button>
+        <button class="mcq-btn" onclick="mcqClick(this,'c2q1', afterC2Q1)">لا يمكن استنتاج أي شيء</button>
+      </div>
+
+      <div id="c2q2wrap" style="display:none;">
+        <div class="q-label">ما اسم الجسيمات سالبة الشحنة التي اكتشفها العلماء؟</div>
+        <div class="mcq-group" id="c2q2">
+          <button class="mcq-btn" onclick="mcqClick(this,'c2q2', afterC2Q2)">البروتونات</button>
+          <button class="mcq-btn" data-correct="true" onclick="mcqClick(this,'c2q2', afterC2Q2)">الإلكترونات</button>
+          <button class="mcq-btn" onclick="mcqClick(this,'c2q2', afterC2Q2)">النيوترونات</button>
+          <button class="mcq-btn" onclick="mcqClick(this,'c2q2', afterC2Q2)">الفوتونات</button>
+        </div>
+      </div>
+
+      <div class="case-toast" id="toast-case2">⚡ تمت إضافة دليل جديد إلى ملف القضية <span class="bonus-tag" id="bonus-case2"></span></div>
+      <div style="margin-top:18px;">
+        <button class="btn btn-primary" id="next-case2" onclick="goCase(3)" disabled>القضية التالية</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ القضية 3 ============ -->
+  <section class="screen" id="screen-case3">
+    <div class="screen-inner">
+      <div class="case-header"><div class="case-num">3</div><span class="eyebrow">مشكلة ثومسون</span></div>
+      <p class="case-desc">اكتشفنا جسيمات سالبة الشحنة داخل الذرّة. لكن هناك مشكلة!</p>
+
+      <div class="q-label">إذا كانت الذرّة متعادلة كهربائيًا، فكيف يمكن تفسير ذلك؟</div>
+      <div class="mcq-group" id="c3q1">
+        <button class="mcq-btn" data-correct="true" onclick="mcqClick(this,'c3q1', afterC3Q1)">وجود شحنة موجبة تعادل الشحنة السالبة</button>
+        <button class="mcq-btn" onclick="mcqClick(this,'c3q1', afterC3Q1)">الإلكترونات تتحوّل إلى شحنة موجبة</button>
+        <button class="mcq-btn" onclick="mcqClick(this,'c3q1', afterC3Q1)">عدد الإلكترونات داخل الذرّة صفر</button>
+        <button class="mcq-btn" onclick="mcqClick(this,'c3q1', afterC3Q1)">الذرّة لا تحتوي على أي شحنة أصلًا</button>
+      </div>
+
+      <div id="c3model" style="display:none;">
+        <svg viewBox="0 0 200 200" width="150" style="margin:8px auto 6px; display:block;">
+          <defs>
+            <radialGradient id="puddingGrad" cx="40%" cy="35%" r="70%">
+              <stop offset="0" stop-color="#ffdb6b"/><stop offset="1" stop-color="#f2b705"/>
+            </radialGradient>
+          </defs>
+          <circle cx="100" cy="100" r="85" fill="url(#puddingGrad)" opacity="0.35"/>
+          <circle cx="100" cy="100" r="85" fill="none" stroke="#f2b705" stroke-width="2" stroke-dasharray="3 5"/>
+          <circle cx="70" cy="70" r="7" fill="#4fd9e8"/>
+          <circle cx="130" cy="60" r="7" fill="#4fd9e8"/>
+          <circle cx="60" cy="130" r="7" fill="#4fd9e8"/>
+          <circle cx="140" cy="120" r="7" fill="#4fd9e8"/>
+          <circle cx="100" cy="150" r="7" fill="#4fd9e8"/>
+          <circle cx="105" cy="95" r="7" fill="#4fd9e8"/>
+        </svg>
+        <p class="case-desc" style="margin-top:0;">نموذج ثومسون: شحنة موجبة منتشرة تتخللها إلكترونات سالبة صغيرة.</p>
+
+        <div class="q-label">اضغط على العناصر التي تمثّل مكوّنات نموذج ثومسون</div>
+        <div class="select-chips" id="thomsonChips">
+          <div class="sel-chip" data-key="pos" onclick="toggleChip(this)">شحنة موجبة</div>
+          <div class="sel-chip" data-key="ele" onclick="toggleChip(this)">إلكترونات سالبة</div>
+          <div class="sel-chip" data-key="nuc" onclick="toggleChip(this)">نواة</div>
+          <div class="sel-chip" data-key="neu" onclick="toggleChip(this)">نيوترونات</div>
+          <div class="sel-chip" data-key="void" onclick="toggleChip(this)">فراغ كامل</div>
+        </div>
+        <button class="btn btn-ghost" onclick="checkThomsonChips()">تحقّق من الإجابة</button>
+      </div>
+
+      <div class="case-toast" id="toast-case3">✓ اكتملت القضية الثالثة <span class="bonus-tag" id="bonus-case3"></span></div>
+      <div style="margin-top:18px;">
+        <button class="btn btn-primary" id="next-case3" onclick="goCase(4)" disabled>القضية التالية</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ القضية 4 ============ -->
+  <section class="screen" id="screen-case4">
+    <div class="screen-inner">
+      <div class="case-header"><div class="case-num">4</div><span class="eyebrow cyan">قبل تجربة رذرفورد</span></div>
+      <p class="case-desc">مصدر جسيمات ألفا ← صفيحة ذهب رقيقة ← شاشة رصد.<br>أنت الآن العالِم المسؤول عن التجربة.</p>
+
+      <div class="q-label">قبل تشغيل التجربة، ما توقعك لمسار الجسيمات؟</div>
+      <div class="mcq-group" id="c4predict">
+        <button class="mcq-btn" onclick="predictClick(this)">معظم الجسيمات تمرّ مباشرة</button>
+        <button class="mcq-btn" onclick="predictClick(this)">معظم الجسيمات تنحرف</button>
+        <button class="mcq-btn" onclick="predictClick(this)">معظم الجسيمات ترتدّ</button>
+      </div>
+
+      <button class="btn btn-primary" id="runExpBtn" onclick="runRutherfordExperiment()" disabled>🔴 شغّل التجربة</button>
+
+      <div class="canvas-wrap">
+        <canvas id="rutherfordCanvas" width="560" height="240"></canvas>
+      </div>
+      <div class="canvas-caption">مصدر الجسيمات (يسار) ← صفيحة ذهب رقيقة (وسط) ← شاشة رصد (يمين)</div>
+
+      <div class="observe-block" id="observeBlock">
+        <p class="q-label" style="margin-top:26px;">سجّل ملاحظاتك</p>
+
+        <div class="q-label">ماذا حدث لمعظم الجسيمات؟</div>
+        <div class="mcq-group" id="c4q1">
+          <button class="mcq-btn" data-correct="true" onclick="mcqClick(this,'c4q1', afterC4Group)">مرّت مباشرة دون أي انحراف</button>
+          <button class="mcq-btn" onclick="mcqClick(this,'c4q1', afterC4Group)">انحرفت بزوايا مختلفة</button>
+          <button class="mcq-btn" onclick="mcqClick(this,'c4q1', afterC4Group)">ارتدّت للخلف بزاوية كبيرة</button>
+        </div>
+
+        <div class="q-label">ماذا حدث لعدد قليل منها؟</div>
+        <div class="mcq-group" id="c4q2">
+          <button class="mcq-btn" onclick="mcqClick(this,'c4q2', afterC4Group)">مرّت مباشرة دون أي انحراف</button>
+          <button class="mcq-btn" data-correct="true" onclick="mcqClick(this,'c4q2', afterC4Group)">انحرفت بزوايا مختلفة</button>
+          <button class="mcq-btn" onclick="mcqClick(this,'c4q2', afterC4Group)">ارتدّت للخلف بزاوية كبيرة</button>
+        </div>
+
+        <div class="q-label">ماذا حدث لعدد قليل جدًا منها؟</div>
+        <div class="mcq-group" id="c4q3">
+          <button class="mcq-btn" onclick="mcqClick(this,'c4q3', afterC4Group)">مرّت مباشرة دون أي انحراف</button>
+          <button class="mcq-btn" onclick="mcqClick(this,'c4q3', afterC4Group)">انحرفت بزوايا مختلفة</button>
+          <button class="mcq-btn" data-correct="true" onclick="mcqClick(this,'c4q3', afterC4Group)">ارتدّت للخلف بزاوية كبيرة</button>
+        </div>
+      </div>
+
+      <div class="case-toast" id="toast-case4">✓ اكتملت القضية الرابعة <span class="bonus-tag" id="bonus-case4"></span></div>
+      <div style="margin-top:18px;">
+        <button class="btn btn-primary" id="next-case4" onclick="goCase(5)" disabled>القضية التالية</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ القضية 5 ============ -->
+  <section class="screen" id="screen-case5">
+    <div class="screen-inner">
+      <div class="case-header"><div class="case-num">5</div><span class="eyebrow gold">حل القضية 🧠</span></div>
+      <h2 class="title-lg">راجع الأدلة التي جمعتها</h2>
+
+      <div class="evidence-grid">
+        <div class="evidence-card"><span class="e-tag">🧩 الدليل 1</span><p>دالتون اعتقد أن الذرّة غير قابلة للتجزئة.</p></div>
+        <div class="evidence-card"><span class="e-tag">🧩 الدليل 2</span><p>تمّ اكتشاف الإلكترونات داخل الذرّة.</p></div>
+        <div class="evidence-card"><span class="e-tag">🧩 الدليل 3</span><p>الذرّة متعادلة، لذلك توجد شحنة موجبة موازنة.</p></div>
+        <div class="evidence-card"><span class="e-tag">🧩 الدليل 4</span><p>نتائج تجربة رذرفورد كانت غير متوقّعة.</p></div>
+      </div>
+
+      <div class="q-label">أي عبارة تمثّل أفضل وصف لتطوّر فهم العلماء للذرّة؟</div>
+      <div class="mcq-group" id="c5q1">
+        <button class="mcq-btn" onclick="mcqClick(this,'c5q1', afterC5)">كل عالِم كان مخطئًا تمامًا، وجاء من بعده ليصحّح خطأه بالكامل</button>
+        <button class="mcq-btn" data-correct="true" onclick="mcqClick(this,'c5q1', afterC5)">النماذج العلمية تتطوّر عندما تظهر أدلة وتجارب جديدة لا يفسّرها النموذج السابق</button>
+        <button class="mcq-btn" onclick="mcqClick(this,'c5q1', afterC5)">لا علاقة بين تجربة وأخرى، فكل عالِم عمل بمعزل تام عن غيره</button>
+        <button class="mcq-btn" onclick="mcqClick(this,'c5q1', afterC5)">النموذج الذري الحالي كان معروفًا منذ البداية، والتجارب فقط أكّدته</button>
+      </div>
+
+      <div class="case-toast" id="toast-case5">🧠 اكتملت القضية الأخيرة <span class="bonus-tag" id="bonus-case5"></span></div>
+      <div style="margin-top:18px;">
+        <button class="btn btn-primary" id="next-case5" onclick="goResult()" disabled>عرض النتيجة</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ شاشة النتيجة ============ -->
+  <section class="screen" id="screen-result">
+    <div class="screen-inner">
+      <div class="badge-hero" id="resultEmoji">🧪</div>
+      <div class="badge-title" id="resultTitle">مساعد مختبر</div>
+      <div class="badge-score" id="resultScore">0 نقطة</div>
+      <div class="encourage-box" id="resultMsg">ملفك العلمي أصبح أقوى… لكن القضية لم تُغلق بعد.</div>
+      <div class="locked-next">🔒 القضية التالية: ما الذي يوجد في مركز الذرّة؟<br>سنكتشف ذلك في الحصة القادمة…</div>
+      <div style="margin-top:22px;">
+        <button class="btn btn-primary" onclick="goClosing()">التالي</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ اللمسة الأخيرة ============ -->
+  <section class="screen" id="screen-closing">
+    <div class="screen-inner">
+      <p class="line" id="cl-1" style="font-weight:700; color:var(--ink);">لقد جمعت الأدلة…</p>
+      <div class="evidence-grid" id="closingEvidence" style="margin-top:18px;"></div>
+      <p class="line" id="cl-2">لكن هناك سؤالًا واحدًا لم تستطع اللعبة الإجابة عنه…</p>
+      <div class="final-q" id="finalQ">❓ إذا كانت الذرّة تحتوي إلكترونات سالبة وشحنة موجبة، فأين توجد هذه الشحنة الموجبة؟</div>
+      <p class="line" id="cl-3" style="color:var(--red); font-weight:700;">🔒 القضية التالية تبدأ في الحصة القادمة.</p>
+      <div style="margin-top:24px;">
+        <button class="btn btn-ghost" onclick="restartGame()">🔄 إعادة المحاولة</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ============================================================
+   الحالة العامة — بدون localStorage (تُحفظ داخل الجلسة فقط)
+   ============================================================ */
+let score = 0;
+let muted = false;
+let audioCtx = null;
+let currentCase = 0; /* 0 = intro */
+const totalCases = 5;
+
+const stats = { correct:0, wrong:0 };
+const registeredQuestions = new Set();
+const caseHadError = { case1:false, case2:false, case3:false, case4:false, case5:false };
+const caseCompleted = { case1:false, case2:false, case3:false, case4:false, case5:false };
+
+/* ============================================================
+   الصوت — Web Audio API فقط
+   ============================================================ */
+function ensureAudio(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e){ audioCtx = null; }
+  }
+  if(audioCtx && audioCtx.state === 'suspended'){ audioCtx.resume(); }
+}
+function tone(freq, duration, type, gainVal, delay){
+  if(muted || !audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type || 'sine';
+  osc.frequency.value = freq;
+  const t0 = audioCtx.currentTime + (delay||0);
+  gain.gain.setValueAtTime(gainVal||0.1, t0);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0 + duration);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(t0); osc.stop(t0 + duration + 0.05);
+}
+function playClick(){ ensureAudio(); tone(500,0.08,'square',0.06,0); }
+function playSuccess(){ ensureAudio(); tone(600,0.11,'sine',0.09,0); tone(880,0.15,'sine',0.09,0.09); }
+function playError(){ ensureAudio(); tone(180,0.18,'sawtooth',0.06,0); }
+function playCaseComplete(){ ensureAudio(); tone(520,0.1,'sine',0.09,0); tone(660,0.1,'sine',0.09,0.1); tone(880,0.18,'sine',0.1,0.2); }
+function toggleMute(){
+  muted = !muted;
+  document.getElementById('muteBtn').textContent = muted ? '🔇' : '🔊';
+  playClick();
+}
+
+/* ============================================================
+   النقاط والتسجيل
+   ============================================================ */
+function addPoints(n){
+  score += n;
+  const badge = document.getElementById('scoreBadge');
+  badge.textContent = score + ' نقطة';
+  badge.classList.add('pulse');
+  setTimeout(()=>badge.classList.remove('pulse'), 260);
+  updateTeacherInfo();
+}
+function registerResult(qid, hadError){
+  if(registeredQuestions.has(qid)) return;
+  registeredQuestions.add(qid);
+  stats.correct++;
+  if(hadError) stats.wrong++;
+  updateTeacherInfo();
+}
+function updateTeacherInfo(){
+  document.getElementById('tCorrect').textContent = stats.correct;
+  document.getElementById('tWrong').textContent = stats.wrong;
+  document.getElementById('tScore').textContent = score;
+  const total = stats.correct + stats.wrong;
+  document.getElementById('tMastery').textContent = total ? Math.round((stats.correct/total)*100)+'%' : '—';
+}
+
+/* ============================================================
+   شريط التقدّم والتنقل بين القضايا
+   ============================================================ */
+function setProgress(caseIdx){
+  const pct = Math.min(100, (caseIdx/totalCases)*100);
+  document.getElementById('progressFill').style.width = pct+'%';
+}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function startInvestigation(){ ensureAudio(); playClick(); goCase(1); }
+function goCase(n){
+  playCaseComplete();
+  currentCase = n;
+  setProgress(n-1);
+  showScreen('screen-case'+n);
+}
+function goResult(){
+  setProgress(5);
+  buildResult();
+  showScreen('screen-result');
+}
+function goClosing(){
+  showScreen('screen-closing');
+  runClosingSequence();
+}
+
+/* ============================================================
+   مساعد عام لأسئلة الاختيار من متعدد (MCQ)
+   ============================================================ */
+function mcqClick(btn, qid, onCorrectCallback){
+  const group = btn.parentElement;
+  if(group.classList.contains('locked')) return;
+  const isCorrect = btn.dataset.correct === 'true';
+  if(isCorrect){
+    group.classList.add('locked');
+    btn.classList.add('correct-choice');
+    Array.from(group.children).forEach(b=>{ if(b!==btn) b.disabled = true; });
+    playSuccess();
+    const hadErr = group.dataset.hadError === 'true';
+    registerResult(qid, hadErr);
+    if(hadErr){ markCaseError(qid); }
+    if(onCorrectCallback) onCorrectCallback();
+  } else {
+    btn.classList.add('wrong-choice');
+    group.dataset.hadError = 'true';
+    playError();
+    showToast('✗ حاول مرة أخرى');
+    setTimeout(()=>btn.classList.remove('wrong-choice'), 500);
+  }
+}
+function markCaseError(qid){
+  const caseKey = qid.split('q')[0].split('predict')[0];
+  if(caseHadError.hasOwnProperty(caseKey)) caseHadError[caseKey] = true;
+}
+function showToast(msg){
+  const t = document.getElementById('floatToast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1200);
+}
+function completeCase(caseKey, toastId, bonusId, nextBtnId){
+  addPoints(100);
+  let bonusText = '';
+  if(!caseHadError[caseKey]){ addPoints(20); bonusText = '+20 مكافأة بلا أخطاء'; }
+  document.getElementById(bonusId).textContent = bonusText;
+  document.getElementById(toastId).classList.add('show');
+  document.getElementById(nextBtnId).disabled = false;
+  caseCompleted[caseKey] = true;
+}
+
+/* ============================================================
+   القضية 1 — السحب والإفلات
+   ============================================================ */
+const ideaBank = [
+  {id:'d1', text:'الذرّة كرة صلبة غير قابلة للتجزئة.', target:'dalton'},
+  {id:'d2', text:'ذرات العنصر الواحد متشابهة تمامًا في الكتلة والخواص.', target:'dalton'},
+  {id:'t1', text:'الذرّة تحتوي إلكترونات سالبة ضمن شحنة موجبة منتشرة.', target:'thomson'},
+  {id:'t2', text:'اكتشاف الإلكترون باستخدام أنبوب التفريغ الكهربائي.', target:'thomson'},
+  {id:'r1', text:'أطلق جسيمات ألفا نحو صفيحة رقيقة من الذهب.', target:'rutherford'},
+  {id:'r2', text:'افترض وجود نواة صغيرة جدًا موجبة الشحنة في مركز الذرّة.', target:'rutherford'}
+];
+let placedCount = 0;
+let dragEl = null, dragOffsetX = 0, dragOffsetY = 0, dragOrigin = null;
+
+function buildTray(){
+  const tray = document.getElementById('chipTray');
+  tray.innerHTML = '';
+  const shuffled = [...ideaBank].sort(()=>Math.random()-0.5);
+  shuffled.forEach(idea=>{
+    const chip = document.createElement('div');
+    chip.className = 'drag-chip';
+    chip.textContent = idea.text;
+    chip.dataset.target = idea.target;
+    chip.dataset.id = idea.id;
+    chip.addEventListener('pointerdown', onChipPointerDown);
+    tray.appendChild(chip);
+  });
+}
+function onChipPointerDown(e){
+  const chip = e.currentTarget;
+  if(chip.classList.contains('locked')) return;
+  ensureAudio();
+  dragEl = chip;
+  chip.setPointerCapture(e.pointerId);
+  const rect = chip.getBoundingClientRect();
+  dragOffsetX = e.clientX - rect.left;
+  dragOffsetY = e.clientY - rect.top;
+  dragOrigin = { parent: chip.parentElement, next: chip.nextSibling };
+  chip.style.position = 'fixed';
+  chip.style.width = rect.width+'px';
+  chip.style.left = rect.left+'px';
+  chip.style.top = rect.top+'px';
+  chip.style.zIndex = 999;
+  chip.classList.add('dragging');
+  document.addEventListener('pointermove', onChipPointerMove);
+  document.addEventListener('pointerup', onChipPointerUp);
+}
+function onChipPointerMove(e){
+  if(!dragEl) return;
+  dragEl.style.left = (e.clientX - dragOffsetX) + 'px';
+  dragEl.style.top = (e.clientY - dragOffsetY) + 'px';
+  document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('hover-zone'));
+  const under = document.elementFromPoint(e.clientX, e.clientY);
+  const zone = under ? under.closest('.drop-zone') : null;
+  if(zone) zone.classList.add('hover-zone');
+}
+function onChipPointerUp(e){
+  if(!dragEl) return;
+  const chip = dragEl;
+  document.querySelectorAll('.drop-zone').forEach(z=>z.classList.remove('hover-zone'));
+  const under = document.elementFromPoint(e.clientX, e.clientY);
+  const zone = under ? under.closest('.drop-zone') : null;
+  document.removeEventListener('pointermove', onChipPointerMove);
+  document.removeEventListener('pointerup', onChipPointerUp);
+  dragEl = null;
+  chip.style.position = '';
+  chip.style.left = ''; chip.style.top = ''; chip.style.width = ''; chip.style.zIndex = '';
+  chip.classList.remove('dragging');
+
+  if(zone && zone.dataset.key === chip.dataset.target){
+    placeCorrect(chip, zone);
+  } else if(zone){
+    wrongDrop(chip);
+  } else {
+    /* أُفلتت خارج أي منطقة — تعود للسلة تلقائيًا (تدفّق طبيعي) */
+  }
+}
+function placeCorrect(chip, zone){
+  playSuccess();
+  chip.classList.add('placed', 'locked');
+  chip.removeEventListener('pointerdown', onChipPointerDown);
+  zone.querySelector('.zone-items').appendChild(chip);
+  placedCount++;
+  registerResult('case1-'+chip.dataset.id, chip.dataset.hadError === 'true');
+  if(chip.dataset.hadError === 'true'){ caseHadError.case1 = true; }
+  if(placedCount >= ideaBank.length){
+    completeCase('case1','toast-case1','bonus-case1','next-case1');
+  }
+}
+function wrongDrop(chip){
+  chip.dataset.hadError = 'true';
+  caseHadError.case1 = true;
+  chip.classList.add('shake');
+  playError();
+  showToast('✗ حاول مرة أخرى');
+  setTimeout(()=>chip.classList.remove('shake'), 420);
+}
+
+/* ============================================================
+   القضية 2 — يظهر السؤال الثاني بعد الأول
+   ============================================================ */
+function afterC2Q1(){
+  document.getElementById('c2q2wrap').style.display = 'block';
+}
+function afterC2Q2(){
+  completeCase('case2','toast-case2','bonus-case2','next-case2');
+}
+
+/* ============================================================
+   القضية 3 — اختيار متعدد + عرض النموذج
+   ============================================================ */
+function afterC3Q1(){
+  document.getElementById('c3model').style.display = 'block';
+}
+let thomsonSelected = new Set();
+let thomsonHadError = false;
+function toggleChip(el){
+  if(el.classList.contains('locked')) return;
+  playClick();
+  const key = el.dataset.key;
+  if(thomsonSelected.has(key)){ thomsonSelected.delete(key); el.classList.remove('selected'); }
+  else { thomsonSelected.add(key); el.classList.add('selected'); }
+}
+function checkThomsonChips(){
+  const correctSet = new Set(['pos','ele']);
+  const chips = document.querySelectorAll('#thomsonChips .sel-chip');
+  let isExact = thomsonSelected.size === correctSet.size && [...thomsonSelected].every(k=>correctSet.has(k));
+  if(isExact){
+    chips.forEach(c=>{
+      c.classList.add('locked');
+      if(correctSet.has(c.dataset.key)) c.classList.add('correct-mark');
+    });
+    playSuccess();
+    registerResult('case3-components', thomsonHadError);
+    if(thomsonHadError) caseHadError.case3 = true;
+    completeCase('case3','toast-case3','bonus-case3','next-case3');
+  } else {
+    thomsonHadError = true;
+    caseHadError.case3 = true;
+    chips.forEach(c=>{
+      if(thomsonSelected.has(c.dataset.key) && !correctSet.has(c.dataset.key)){
+        c.classList.add('wrong-mark');
+        setTimeout(()=>c.classList.remove('wrong-mark'), 600);
+      }
+    });
+    playError();
+    showToast('✗ حاول مرة أخرى');
+  }
+}
+
+/* ============================================================
+   القضية 4 — تجربة رذرفورد التفاعلية
+   ============================================================ */
+function predictClick(btn){
+  playClick();
+  const group = btn.parentElement;
+  if(group.classList.contains('locked')) return;
+  group.classList.add('locked');
+  Array.from(group.children).forEach(b=>{ b.disabled = true; if(b===btn) b.classList.add('correct-choice'); });
+  document.getElementById('runExpBtn').disabled = false;
+}
+
+let rutherfordDone = false;
+function runRutherfordExperiment(){
+  if(rutherfordDone) return;
+  rutherfordDone = true;
+  ensureAudio();
+  playClick();
+  const btn = document.getElementById('runExpBtn');
+  btn.disabled = true;
+  btn.textContent = 'جارٍ تشغيل التجربة...';
+  startRutherfordCanvas(()=>{
+    btn.textContent = '✓ تمّت التجربة';
+    document.getElementById('observeBlock').classList.add('show');
+  });
+}
+function afterC4Group(){
+  const q1done = document.getElementById('c4q1').classList.contains('locked');
+  const q2done = document.getElementById('c4q2').classList.contains('locked');
+  const q3done = document.getElementById('c4q3').classList.contains('locked');
+  if(q1done && q2done && q3done){
+    const err = caseHadError.case4;
+    completeCase('case4','toast-case4','bonus-case4','next-case4');
+  }
+}
+
+function startRutherfordCanvas(onDone){
+  const canvas = document.getElementById('rutherfordCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const foilX = W*0.52;
+  let particles = [];
+  let spawnCount = 0;
+  const maxSpawn = 55;
+
+  function spawnParticle(){
+    const r = Math.random();
+    let category;
+    if(r < 0.90) category = 'straight';
+    else if(r < 0.98) category = 'deflect';
+    else category = 'bounce';
+    particles.push({
+      x: 30, y: H/2 + (Math.random()-0.5)*90,
+      vx: 2.6 + Math.random()*0.6,
+      vy: (Math.random()-0.5)*0.3,
+      category, bent:false
+    });
+  }
+  const spawnTimer = setInterval(()=>{
+    spawnParticle();
+    spawnCount++;
+    if(spawnCount >= maxSpawn) clearInterval(spawnTimer);
+  }, 90);
+
+  function drawFoilAndSource(){
+    /* الصفيحة الذهبية */
+    const grad = ctx.createLinearGradient(foilX-6,0,foilX+6,0);
+    grad.addColorStop(0,'#c9971f'); grad.addColorStop(0.5,'#ffe08a'); grad.addColorStop(1,'#c9971f');
+    ctx.fillStyle = grad;
+    ctx.fillRect(foilX-4, 20, 8, H-40);
+    /* أنوية متناثرة داخل الصفيحة (للسياق البصري فقط) */
+    ctx.fillStyle = 'rgba(255,224,138,0.9)';
+    for(let i=0;i<7;i++){ ctx.beginPath(); ctx.arc(foilX, 30 + i*((H-60)/6), 2.4, 0, Math.PI*2); ctx.fill(); }
+    /* مصدر */
+    ctx.fillStyle = '#3a4a63';
+    ctx.fillRect(10, H/2-16, 16, 32);
+    /* شاشة الرصد */
+    ctx.strokeStyle = 'rgba(159,176,198,0.35)';
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(W-14,10); ctx.lineTo(W-14,H-10); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function step(){
+    ctx.clearRect(0,0,W,H);
+    drawFoilAndSource();
+    particles.forEach(p=>{
+      if(!p.bent && p.x >= foilX){
+        p.bent = true;
+        if(p.category === 'deflect'){
+          const ang = (Math.random()-0.5) * 0.9;
+          p.vy += ang; p.vx *= 0.82;
+        } else if(p.category === 'bounce'){
+          p.vx = -Math.abs(p.vx) * 0.9;
+          p.vy = (Math.random()-0.5)*1.4;
+        }
+      }
+      p.x += p.vx; p.y += p.vy;
+      let color = '#4fd9e8';
+      if(p.category === 'deflect') color = '#f2b705';
+      if(p.category === 'bounce') color = '#ff5b6a';
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.shadowColor = color; ctx.shadowBlur = 6;
+      ctx.arc(p.x, p.y, 2.6, 0, Math.PI*2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+    particles = particles.filter(p => p.x > -10 && p.x < W+10 && p.y > -10 && p.y < H+10);
+
+    if(spawnCount >= maxSpawn && particles.length === 0){
+      cancelAnimationFrame(rafId);
+      if(onDone) onDone();
+      return;
+    }
+    rafId = requestAnimationFrame(step);
+  }
+  let rafId = requestAnimationFrame(step);
+  /* أمان: أوقف حتمًا بعد 8 ثوانٍ حتى لو تبقّت جسيمات */
+  setTimeout(()=>{
+    if(spawnCount < maxSpawn){ clearInterval(spawnTimer); spawnCount = maxSpawn; }
+  }, 5200);
+  setTimeout(()=>{
+    cancelAnimationFrame(rafId);
+    if(!document.getElementById('observeBlock').classList.contains('show') && onDone) onDone();
+  }, 8000);
+}
+
+/* ============================================================
+   القضية 5
+   ============================================================ */
+function afterC5(){
+  completeCase('case5','toast-case5','bonus-case5','next-case5');
+}
+
+/* ============================================================
+   النتيجة النهائية
+   ============================================================ */
+function buildResult(){
+  let emoji='🧪', title='مساعد مختبر';
+  if(score >= 450){ emoji='🧠'; title='عالِم ذرّة'; }
+  else if(score >= 250){ emoji='🔬'; title='محقق علمي'; }
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultScore').textContent = score + ' نقطة';
+}
+
+/* ============================================================
+   اللمسة الأخيرة
+   ============================================================ */
+function runClosingSequence(){
+  const evGrid = document.getElementById('closingEvidence');
+  evGrid.innerHTML = '';
+  document.getElementById('cl-1').classList.remove('show');
+  document.getElementById('cl-2').classList.remove('show');
+  document.getElementById('cl-3').classList.remove('show');
+  document.getElementById('finalQ').classList.remove('show');
+
+  setTimeout(()=>document.getElementById('cl-1').classList.add('show'), 150);
+
+  const evidences = [
+    {tag:'🧩 الدليل 1', text:'دالتون اعتقد أن الذرّة غير قابلة للتجزئة.'},
+    {tag:'🧩 الدليل 2', text:'تمّ اكتشاف الإلكترونات داخل الذرّة.'},
+    {tag:'🧩 الدليل 3', text:'الذرّة متعادلة، لذلك توجد شحنة موجبة موازنة.'},
+    {tag:'🧩 الدليل 4', text:'نتائج تجربة رذرفورد كانت غير متوقّعة.'}
+  ];
+  evidences.forEach((ev,i)=>{
+    const card = document.createElement('div');
+    card.className = 'evidence-card line';
+    card.style.textAlign = 'right';
+    card.innerHTML = '<span class="e-tag">'+ev.tag+'</span><p>'+ev.text+'</p>';
+    evGrid.appendChild(card);
+    setTimeout(()=>{ card.classList.add('show'); playReveal(); }, 700 + i*450);
+  });
+
+  const afterEvidence = 700 + evidences.length*450 + 400;
+  setTimeout(()=>document.getElementById('cl-2').classList.add('show'), afterEvidence);
+  setTimeout(()=>document.getElementById('finalQ').classList.add('show'), afterEvidence + 1100);
+  setTimeout(()=>document.getElementById('cl-3').classList.add('show'), afterEvidence + 2200);
+}
+function playReveal(){ ensureAudio(); tone(340,0.4,'sine',0.05,0); }
+
+/* ============================================================
+   إعادة اللعبة بالكامل
+   ============================================================ */
+function restartGame(){
+  playClick();
+  score = 0; placedCount = 0; rutherfordDone = false;
+  stats.correct = 0; stats.wrong = 0;
+  registeredQuestions.clear();
+  Object.keys(caseHadError).forEach(k=>caseHadError[k]=false);
+  Object.keys(caseCompleted).forEach(k=>caseCompleted[k]=false);
+  thomsonSelected = new Set();
+  thomsonHadError = false;
+
+  document.getElementById('scoreBadge').textContent = '0 نقطة';
+  updateTeacherInfo();
+  toggleTeacher(true);
+
+  /* إعادة بناء القضية 1 */
+  buildTray();
+  document.querySelectorAll('.zone-items').forEach(z=>z.innerHTML='');
+  document.getElementById('toast-case1').classList.remove('show');
+  document.getElementById('next-case1').disabled = true;
+
+  /* إعادة القضية 2 */
+  resetMcqGroup('c2q1'); resetMcqGroup('c2q2');
+  document.getElementById('c2q2wrap').style.display='none';
+  document.getElementById('toast-case2').classList.remove('show');
+  document.getElementById('next-case2').disabled = true;
+
+  /* إعادة القضية 3 */
+  resetMcqGroup('c3q1');
+  document.getElementById('c3model').style.display='none';
+  document.querySelectorAll('#thomsonChips .sel-chip').forEach(c=>c.className='sel-chip');
+  document.getElementById('toast-case3').classList.remove('show');
+  document.getElementById('next-case3').disabled = true;
+
+  /* إعادة القضية 4 */
+  resetMcqGroup('c4predict'); resetMcqGroup('c4q1'); resetMcqGroup('c4q2'); resetMcqGroup('c4q3');
+  document.getElementById('runExpBtn').disabled = true;
+  document.getElementById('runExpBtn').textContent = '🔴 شغّل التجربة';
+  document.getElementById('observeBlock').classList.remove('show');
+  document.getElementById('toast-case4').classList.remove('show');
+  document.getElementById('next-case4').disabled = true;
+  const c = document.getElementById('rutherfordCanvas');
+  c.getContext('2d').clearRect(0,0,c.width,c.height);
+
+  /* إعادة القضية 5 */
+  resetMcqGroup('c5q1');
+  document.getElementById('toast-case5').classList.remove('show');
+  document.getElementById('next-case5').disabled = true;
+
+  setProgress(0);
+  showScreen('screen-intro');
+}
+function resetMcqGroup(id){
+  const group = document.getElementById(id);
+  if(!group) return;
+  group.classList.remove('locked');
+  group.dataset.hadError = 'false';
+  Array.from(group.children).forEach(b=>{
+    b.disabled = false;
+    b.classList.remove('correct-choice','wrong-choice');
+  });
+}
+
+/* ============================================================
+   وضع المعلم
+   ============================================================ */
+function toggleTeacher(forceClose){
+  const panel = document.getElementById('teacherPanel');
+  if(forceClose){ panel.classList.remove('open'); return; }
+  panel.classList.toggle('open');
+}
+
+/* ============================================================
+   خلفية الجسيمات
+   ============================================================ */
+(function particlesBg(){
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let w,h,dots=[];
+  function resize(){ w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight; }
+  function init(){
+    resize();
+    const count = Math.min(46, Math.floor((w*h)/26000));
+    dots = Array.from({length:count}, ()=>({
+      x:Math.random()*w, y:Math.random()*h,
+      vx:(Math.random()-0.5)*0.16, vy:(Math.random()-0.5)*0.16,
+      r:Math.random()*1.6+0.6,
+      hue: Math.random()>0.5 ? '79,217,232' : '255,91,106'
+    }));
+  }
+  function tick(){
+    ctx.clearRect(0,0,w,h);
+    dots.forEach(d=>{
+      d.x+=d.vx; d.y+=d.vy;
+      if(d.x<0)d.x=w; if(d.x>w)d.x=0; if(d.y<0)d.y=h; if(d.y>h)d.y=0;
+      ctx.beginPath(); ctx.fillStyle='rgba('+d.hue+',0.5)';
+      ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.fill();
+    });
+    requestAnimationFrame(tick);
+  }
+  window.addEventListener('resize', resize);
+  init(); tick();
+})();
+
+/* ============================================================
+   التهيئة الأولية
+   ============================================================ */
+buildTray();
+updateTeacherInfo();
+</script>
+</body>
+</html>
