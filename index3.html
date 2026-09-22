@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مهمة الذرة الغامضة — التوزيع الإلكتروني والجدول الدوري</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#070b14;
+    --panel:#101b30;
+    --panel-2:#16233d;
+    --line:#28395a;
+    --text:#eaf1fb;
+    --text-dim:#93a5c4;
+    --amber:#ffb400;
+    --amber-dim:#ffb40022;
+    --cyan:#3ec6f2;
+    --success:#34d399;
+    --error:#fb7185;
+    --radius:20px;
+    --font:'Tajawal','Segoe UI',sans-serif;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 20% -10%, #10203f 0%, transparent 55%),
+      radial-gradient(circle at 100% 110%, #0c1830 0%, transparent 50%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--font);
+    direction:rtl;
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  button{font-family:var(--font);}
+  :focus-visible{outline:3px solid var(--cyan);outline-offset:3px;border-radius:8px;}
+
+  /* ---------- Header ---------- */
+  header{
+    padding:14px clamp(16px,4vw,40px) 10px;
+    padding-top:calc(14px + env(safe-area-inset-top,0px));
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    border-bottom:1px solid var(--line);
+    background:rgba(7,11,20,.55);
+    backdrop-filter:blur(6px);
+    position:sticky;
+    top:0;
+    z-index:20;
+  }
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand-dot{width:12px;height:12px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber);}
+  .brand-text{font-weight:800;font-size:clamp(15px,2vw,19px);letter-spacing:.2px;}
+  .brand-sub{color:var(--text-dim);font-size:13px;margin-inline-start:4px;}
+  .progress{display:flex;gap:7px;}
+  .progress i{
+    width:9px;height:9px;border-radius:50%;
+    background:var(--line);
+    display:block;
+    transition:background .25s, transform .25s;
+  }
+  .progress i.done{background:var(--cyan);}
+  .progress i.active{background:var(--amber);transform:scale(1.35);}
+
+  /* ---------- Stage ---------- */
+  main{
+    flex:1;
+    display:flex;
+    align-items:stretch;
+    justify-content:center;
+    padding:clamp(18px,4vw,44px) clamp(16px,4vw,40px) 110px;
+  }
+  .stage{
+    width:100%;
+    max-width:960px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:22px;
+    animation:fadeIn .35s ease both;
+  }
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  .eyebrow{color:var(--cyan);font-weight:700;font-size:clamp(13px,1.6vw,15px);letter-spacing:.3px;}
+  h1.page-title{
+    font-size:clamp(26px,4.4vw,42px);
+    font-weight:800;
+    margin:0;
+    text-align:center;
+    line-height:1.25;
+  }
+  p.lead{
+    color:var(--text-dim);
+    font-size:clamp(16px,2vw,19px);
+    text-align:center;
+    max-width:640px;
+    line-height:1.9;
+    margin:0;
+  }
+
+  .panel{
+    width:100%;
+    background:linear-gradient(180deg,var(--panel),var(--panel-2));
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:clamp(18px,3.4vw,34px);
+  }
+
+  .btn{
+    border:none;
+    cursor:pointer;
+    border-radius:14px;
+    padding:14px 30px;
+    font-size:clamp(16px,1.9vw,18px);
+    font-weight:700;
+    transition:transform .12s ease, box-shadow .12s ease, background .15s ease;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:var(--amber);color:#1a1200;box-shadow:0 6px 22px -6px var(--amber-dim);}
+  .btn-primary:hover{box-shadow:0 8px 26px -4px rgba(255,180,0,.45);}
+  .btn-ghost{background:transparent;color:var(--text);border:1.5px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
+  .btn-sm{padding:9px 16px;font-size:14px;border-radius:10px;}
+  .btn[disabled]{opacity:.35;cursor:not-allowed;}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center;}
+
+  /* ---------- Atomic number badge ---------- */
+  .z-badge{
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+    background:radial-gradient(circle at 50% 35%, #1a2b4d, #0d1731);
+    border:1px solid var(--line);
+    border-radius:50%;
+    width:clamp(140px,20vw,190px);
+    height:clamp(140px,20vw,190px);
+    justify-content:center;
+    box-shadow:0 0 0 6px rgba(62,198,242,.06), 0 0 40px -10px rgba(62,198,242,.5);
+  }
+  .z-badge b{font-size:clamp(44px,7vw,64px);color:var(--cyan);font-weight:800;line-height:1;}
+  .z-badge span{color:var(--text-dim);font-size:13px;}
+
+  /* ---------- Shell diagram ---------- */
+  .shell-wrap{display:flex;align-items:center;justify-content:center;width:100%;}
+  .shell-svg{width:min(340px,72vw);height:min(340px,72vw);}
+  .shell-ring{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:3 5;}
+  .shell-ring--outer{stroke:var(--cyan);opacity:.55;}
+  .nucleus{fill:var(--amber);}
+  .nucleus-label{fill:#1a1200;font-weight:800;font-size:20px;font-family:var(--font);}
+  .electron{fill:var(--cyan);filter:drop-shadow(0 0 5px rgba(62,198,242,.9));}
+  .electron--pop{animation:pop .35s ease both;}
+  @keyframes pop{from{opacity:0;transform:scale(.1);transform-box:fill-box;transform-origin:center;}to{opacity:1;transform:scale(1);}}
+
+  /* ---------- Steppers ---------- */
+  .steppers{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;width:100%;}
+  .stepper{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:14px 16px;
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    min-width:130px;
+  }
+  .stepper .lvl-label{font-size:13px;color:var(--text-dim);font-weight:700;text-align:center;}
+  .stepper .ctrl{display:flex;align-items:center;gap:12px;}
+  .stepper button{
+    width:38px;height:38px;border-radius:10px;border:1px solid var(--line);
+    background:var(--panel-2);color:var(--text);font-size:20px;cursor:pointer;line-height:1;
+  }
+  .stepper button:hover{border-color:var(--cyan);color:var(--cyan);}
+  .stepper .val{font-size:26px;font-weight:800;min-width:34px;text-align:center;color:var(--amber);}
+
+  /* ---------- Feedback ---------- */
+  .feedback{
+    width:100%;
+    border-radius:14px;
+    padding:14px 18px;
+    font-weight:700;
+    text-align:center;
+    font-size:16px;
+    display:none;
+  }
+  .feedback.show{display:block;animation:fadeIn .25s ease both;}
+  .feedback.ok{background:rgba(52,211,153,.12);color:var(--success);border:1px solid rgba(52,211,153,.35);}
+  .feedback.bad{background:rgba(251,113,133,.12);color:var(--error);border:1px solid rgba(251,113,133,.35);}
+  .feedback.info{background:rgba(62,198,242,.1);color:var(--cyan);border:1px solid rgba(62,198,242,.3);}
+
+  .answer-box{
+    display:none;
+    margin-top:6px;
+    text-align:center;
+    font-size:20px;
+    font-weight:800;
+    color:var(--amber);
+    letter-spacing:1px;
+  }
+  .answer-box.show{display:block;animation:fadeIn .25s ease both;}
+
+  /* ---------- Example chips ---------- */
+  .chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+  .chip{
+    border:1px solid var(--line);
+    background:var(--bg);
+    color:var(--text-dim);
+    padding:8px 16px;
+    border-radius:999px;
+    font-weight:700;
+    cursor:pointer;
+    font-size:14px;
+  }
+  .chip.active{border-color:var(--amber);color:var(--amber);background:rgba(255,180,0,.08);}
+
+  /* ---------- Order-builder cards (page 5) ---------- */
+  .card-pool{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+  .num-card{
+    width:74px;height:74px;border-radius:16px;
+    background:var(--panel-2);border:1.5px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    font-size:26px;font-weight:800;color:var(--text);
+    cursor:pointer;transition:.15s;
+  }
+  .num-card:hover{border-color:var(--cyan);}
+  .num-card.used{opacity:.25;pointer-events:none;}
+  .sequence{
+    display:flex;gap:10px;align-items:center;justify-content:center;
+    min-height:64px;flex-wrap:wrap;
+  }
+  .seq-slot{
+    width:60px;height:60px;border-radius:14px;
+    border:2px dashed var(--line);
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;font-weight:800;color:var(--amber);
+  }
+  .seq-slot.filled{border-style:solid;border-color:var(--cyan);}
+  .arrow{color:var(--text-dim);font-size:20px;}
+
+  /* ---------- Text input ---------- */
+  .text-input{
+    width:min(320px,80vw);
+    padding:14px 16px;
+    border-radius:12px;
+    border:1.5px solid var(--line);
+    background:var(--bg);
+    color:var(--text);
+    font-size:18px;
+    text-align:center;
+    font-family:var(--font);
+  }
+  .text-input:focus{border-color:var(--cyan);}
+
+  /* ---------- Reveal steps (page 7) ---------- */
+  .reveal-block{
+    width:100%;
+    border-top:1px dashed var(--line);
+    padding-top:16px;
+    margin-top:6px;
+    display:none;
+    text-align:center;
+  }
+  .reveal-block.show{display:block;animation:fadeIn .3s ease both;}
+  .reveal-q{font-size:18px;font-weight:700;margin-bottom:10px;}
+  .reveal-a{font-size:22px;font-weight:800;color:var(--amber);}
+
+  /* ---------- Task tabs (page 8) ---------- */
+  .tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .tab{
+    padding:10px 20px;border-radius:12px;border:1.5px solid var(--line);
+    background:var(--bg);color:var(--text-dim);font-weight:700;cursor:pointer;
+  }
+  .tab.active{border-color:var(--amber);color:var(--amber);background:rgba(255,180,0,.08);}
+  .task-panel{display:none;width:100%;flex-direction:column;align-items:center;gap:16px;}
+  .task-panel.show{display:flex;}
+  .task-title{font-weight:800;font-size:19px;}
+
+  /* ---------- Bottom nav ---------- */
+  .navbar{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    padding:14px clamp(16px,4vw,40px);
+    padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));
+    background:rgba(7,11,20,.7);
+    backdrop-filter:blur(8px);
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+    z-index:30;
+  }
+  .navbar .btn{min-width:120px;}
+  .page-count{color:var(--text-dim);font-size:13px;font-weight:700;}
+
+  @media (max-width:560px){
+    .navbar .btn{min-width:96px;padding:12px 18px;font-size:15px;}
+    .stepper{min-width:96px;padding:10px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="brand-dot"></span>
+    <span class="brand-text">مهمة الذرة الغامضة</span>
+    <span class="brand-sub">التوزيع الإلكتروني والجدول الدوري</span>
+  </div>
+  <div class="progress" id="progressDots"></div>
+</header>
+
+<main>
+  <div class="stage" id="stage"></div>
+</main>
+
+<div class="navbar">
+  <button class="btn btn-ghost" id="prevBtn" onclick="goTo(CURRENT.page-1)">‹ السابق</button>
+  <span class="page-count" id="pageCount"></span>
+  <button class="btn btn-primary" id="nextBtn" onclick="goTo(CURRENT.page+1)">التالي ›</button>
+</div>
+
+<script>
+/* ============ Data ============ */
+const TOTAL_PAGES = 8;
+const CURRENT = { page: 1 };
+
+const ELEMENTS = {
+  8:  { sym:'O',  name:'الأكسجين',    dist:[2,6]   },
+  10: { sym:'Ne', name:'النيون',      dist:[2,8]   },
+  11: { sym:'Na', name:'الصوديوم',    dist:[2,8,1] },
+  12: { sym:'Mg', name:'المغنيسيوم', dist:[2,8,2] },
+  15: { sym:'P',  name:'الفوسفور',   dist:[2,8,5] },
+  16: { sym:'S',  name:'الكبريت',    dist:[2,8,6] },
+  17: { sym:'Cl', name:'الكلور',     dist:[2,8,7] },
+  18: { sym:'Ar', name:'الأرجون',    dist:[2,8,8] },
+};
+const SHELL_MAX = [2,8,8];
+
+/* ============ Helpers ============ */
+function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstElementChild; }
+function normalize(s){ return (s||'').toString().trim().toLowerCase().replace(/^ال/,''); }
+
+function shellSVG(dist, opts={}){
+  const {animate=false, highlightOuter=false} = opts;
+  const size=380, cx=size/2, cy=size/2;
+  const radii=[62,108,154];
+  let rings='', electrons='';
+  let counter=0;
+  dist.forEach((count,i)=>{
+    const r=radii[i];
+    const isOuter = highlightOuter && i===dist.length-1;
+    rings += `<circle cx="${cx}" cy="${cy}" r="${r}" class="shell-ring ${isOuter?'shell-ring--outer':''}"></circle>`;
+    for(let e=0;e<count;e++){
+      const angle = (2*Math.PI/count)*e - Math.PI/2;
+      const ex = cx + r*Math.cos(angle);
+      const ey = cy + r*Math.sin(angle);
+      const delay = animate ? (counter*0.05).toFixed(2) : 0;
+      counter++;
+      electrons += `<circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="7" class="electron ${animate?'electron--pop':''}" style="animation-delay:${delay}s"></circle>`;
+    }
+  });
+  const nucleus = `<circle cx="${cx}" cy="${cy}" r="27" class="nucleus"></circle><text x="${cx}" y="${cy+7}" class="nucleus-label" text-anchor="middle">+</text>`;
+  return `<svg viewBox="0 0 ${size} ${size}" class="shell-svg">${rings}${nucleus}${electrons}</svg>`;
+}
+
+function stepperHTML(id, label, max, value){
+  return `
+  <div class="stepper" id="${id}">
+    <div class="lvl-label">${label}</div>
+    <div class="ctrl">
+      <button type="button" onclick="stepChange('${id}',-1,${max})">−</button>
+      <div class="val" id="${id}-val">${value}</div>
+      <button type="button" onclick="stepChange('${id}',1,${max})">+</button>
+    </div>
+  </div>`;
+}
+function stepChange(id, delta, max){
+  const valEl = document.getElementById(id+'-val');
+  let v = parseInt(valEl.textContent,10) + delta;
+  if(v<0) v=0; if(v>max) v=max;
+  valEl.textContent = v;
+  if(id.startsWith('p2-') && typeof updatePage2SVG==='function') updatePage2SVG();
+}
+function stepVal(id){ return parseInt(document.getElementById(id+'-val').textContent,10); }
+
+function showFeedback(elemId, ok, okMsg, badMsg){
+  const f = document.getElementById(elemId);
+  f.className = 'feedback show ' + (ok?'ok':'bad');
+  f.textContent = ok ? okMsg : badMsg;
+}
+function showAnswerBox(id){
+  document.getElementById(id).classList.add('show');
+}
+
+/* ============ Navigation / render ============ */
+function goTo(n){
+  if(n<1||n>TOTAL_PAGES) return;
+  CURRENT.page = n;
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function render(){
+  document.getElementById('stage').innerHTML='';
+  const page = document.getElementById('stage');
+  page.appendChild(PAGES[CURRENT.page]());
+  document.getElementById('prevBtn').disabled = CURRENT.page===1;
+  document.getElementById('nextBtn').disabled = CURRENT.page===TOTAL_PAGES;
+  document.getElementById('pageCount').textContent = `الصفحة ${CURRENT.page} من ${TOTAL_PAGES}`;
+  const dotsWrap = document.getElementById('progressDots');
+  dotsWrap.innerHTML='';
+  for(let i=1;i<=TOTAL_PAGES;i++){
+    const dot=document.createElement('i');
+    if(i<CURRENT.page) dot.className='done';
+    else if(i===CURRENT.page) dot.className='active';
+    dotsWrap.appendChild(dot);
+  }
+}
+
+/* ============ PAGE 1 ============ */
+function page1(){
+  const wrap = el(`<div class="stage">
+    <div class="eyebrow">الدرس الثاني — التوزيع الإلكتروني والجدول الدوري</div>
+    <h1 class="page-title">مهمة الذرة الغامضة ⚡</h1>
+    <p class="lead">لديك ذرة عددها الذري 11… لكن أين تضع إلكتروناتها؟</p>
+    <div class="z-badge"><b>11</b><span>إلكترونًا</span></div>
+    <div class="row" style="margin-top:8px;">
+      <button class="btn btn-primary" onclick="goTo(2)">ابدأ المهمة</button>
+    </div>
+  </div>`);
+  return wrap;
+}
+
+/* ============ PAGE 2 ============ */
+function page2(){
+  const wrap = el(`<div class="stage">
+    <div class="eyebrow">اكتشف الفكرة</div>
+    <h1 class="page-title">كيف توزَّع 11 إلكترونًا؟</h1>
+    <div class="panel" style="display:flex;flex-direction:column;align-items:center;gap:22px;">
+      <div class="shell-wrap" id="p2svg"></div>
+      <div class="steppers">
+        ${stepperHTML('p2-l1','المستوى الأول',SHELL_MAX[0],0)}
+        ${stepperHTML('p2-l2','المستوى الثاني',SHELL_MAX[1],0)}
+        ${stepperHTML('p2-l3','المستوى الثالث',SHELL_MAX[2],0)}
+      </div>
+      <div class="row">
+        <button class="btn btn-primary" onclick="checkPage2()">تحقق</button>
+        <button class="btn btn-ghost btn-sm" onclick="revealPage2()">عرض الإجابة</button>
+      </div>
+      <div class="feedback" id="p2-feedback"></div>
+      <div class="answer-box" id="p2-answer">التوزيع الصحيح: 2 | 8 | 1</div>
+    </div>
+  </div>`);
+  wrap.querySelector('#p2svg').innerHTML = shellSVG([0,0,0]);
+  return wrap;
+}
+function updatePage2SVG(){
+  const svgWrap = document.getElementById('p2svg');
+  if(!svgWrap) return;
+  svgWrap.innerHTML = shellSVG([stepVal('p2-l1'), stepVal('p2-l2'), stepVal('p2-l3')]);
+}
+function checkPage2(){
+  const a=stepVal('p2-l1'), b=stepVal('p2-l2'), c=stepVal('p2-l3');
+  const ok = (a===2 && b===8 && c===1);
+  showFeedback('p2-feedback', ok, 'ممتاز! التوزيع صحيح ⚡', 'ليس تمامًا… راجع عدد الإلكترونات في كل مستوى.');
+}
+function revealPage2(){
+  document.getElementById('p2-l1-val').textContent=2;
+  document.getElementById('p2-l2-val').textContent=8;
+  document.getElementById('p2-l3-val').textContent=1;
+  updatePage2SVG();
+  showAnswerBox('p2-answer');
+}
+
+/* ============ PAGE 3 ============ */
+function page3(){
+  const wrap = el(`<div class="stage">
+    <div class="eyebrow">شرح المعلم</div>
+    <h1 class="page-title">من العدد الذري إلى التوزيع الإلكتروني</h1>
+    <p class="lead">العدد الذري = عدد الإلكترونات في الذرة المتعادلة، وهذه الإلكترونات تتوزع على مستويات الطاقة.</p>
+    <div class="panel" style="display:flex;flex-direction:column;align-items:center;gap:18px;">
+      <div class="row" style="gap:26px;">
+        <div class="z-badge" style="width:110px;height:110px;"><b style="font-size:34px;">Na</b><span>الصوديوم</span></div>
+        <div class="z-badge" style="width:110px;height:110px;"><b style="font-size:34px;">11</b><span>العدد الذري</span></div>
+      </div>
+      <div class="shell-wrap" id="p3svg"></div>
+      <div class="row">
+        <button class="btn btn-ghost btn-sm" onclick="playPage3()">تشغيل الحركة</button>
+      </div>
+      <p style="font-size:22px;font-weight:800;color:var(--amber);margin:0;">2 | 8 | 1</p>
+    </div>
+  </div>`);
+  const target = wrap.querySelector('#p3svg');
+  target.appendChild(el(shellSVG([2,8,1],{animate:true})));
+  return wrap;
+}
+function playPage3(){
+  const target=document.getElementById('p3svg');
+  target.innerHTML='';
+  target.appendChild(el(shellSVG([2,8,1],{animate:true})));
+}
+
+/* ============ PAGE 4 ============ */
+const P4 = { z: 8 };
+function page4(){
+  const wrap = el(`<div class="stage">
+    <div class="eyebrow">تحدٍّ — ابنِ الذرة</div>
+    <h1 class="page-title">ابنِ التوزيع الإلكتروني</h1>
+    <div class="chips" id="p4-chips"></div>
+    <div class="panel" style="display:flex;flex-direction:column;align-items:center;gap:20px;">
+      <div class="z-badge" style="width:110px;height:110px;"><b id="p4-z" style="font-size:34px;"></b><span>العدد الذري</span></div>
+      <div class="steppers">
+        ${stepperHTML('p4-l1','المستوى الأول',SHELL_MAX[0],0)}
+        ${stepperHTML('p4-l2','المستوى الثاني',SHELL_MAX[1],0)}
+        ${stepperHTML('p4-l3','المستوى الثالث',SHELL_MAX[2],0)}
+      </div>
+      <div class="row">
+        <button class="btn btn-primary" onclick="checkPage4()">تحقق</button>
+        <button class="btn btn-ghost btn-sm" onclick="revealPage4()">عرض الإجابة</button>
+      </div>
+      <div class="feedback" id="p4-feedback"></div>
+      <div class="answer-box" id="p4-answer"></div>
+    </div>
+  </div>`);
+  const chipsWrap = wrap.querySelector('#p4-chips');
+  [8,10,11,12,15,17,18].forEach(z=>{
+    const chip = el(`<div class="chip ${z===P4.z?'active':''}" onclick="setPage4Example(${z})">Z = ${z}</div>`);
+    chipsWrap.appendChild(chip);
+  });
+  wrap.querySelector('#p4-z').textContent = P4.z;
+  return wrap;
+}
+function setPage4Example(z){
+  P4.z = z;
+  document.getElementById('p4-z').textContent = z;
+  ['p4-l1','p4-l2','p4-l3'].forEach(id=>{ document.getElementById(id+'-val').textContent = 0; });
+  document.querySelectorAll('#p4-chips .chip').forEach(c=>c.classList.remove('active'));
+  const idx=[8,10,11,12,15,17,18].indexOf(z);
+  document.querySelectorAll('#p4-chips .chip')[idx].classList.add('active');
+  document.getElementById('p4-feedback').className='feedback';
+  document.getElementById('p4-answer').className='answer-box';
+}
+function checkPage4(){
+  const dist = ELEMENTS[P4.z].dist;
+  const a=stepVal('p4-l1'), b=stepVal('p4-l2'), c=stepVal('p4-l3');
+  const got=[a,b,c].filter((v,i)=> i<dist.length ? true : v===0);
+  const expected = [dist[0]||0, dist[1]||0, dist[2]||0];
+  const ok = a===expected[0] && b===expected[1] && c===expected[2];
+  showFeedback('p4-feedback', ok, 'رائع! بنيت الذرة بشكل صحيح 🎯', 'قريب… تحقق من عدد الإلكترونات في كل مستوى.');
+}
+function revealPage4(){
+  const dist = ELEMENTS[P4.z].dist;
+  document.getElementById('p4-l1-val').textContent = dist[0]||0;
+  document.getElementById('p4-l2-val').textContent = dist[1]||0;
+  document.getElementById('p4-l3-val').textContent = dist[2]||0;
+  const box=document.getElementById('p4-answer');
+  box.textContent = 'التوزيع الصحيح: ' + dist.join(' | ');
+  box.classList.add('show');
+}
+
+/* ============ PAGE 5 ============ */
+const P5 = { pool:[1,2,8,11], selected:[], target:[2,8,1] };
+function page5(){
+  P5.selected = [];
+  const wrap = el(`<div class="stage">
+    <div class="eyebrow">نمط مختلف</div>
+    <h1 class="page-title">رتّب الإلكترونات 🧩</h1>
+    <p class="lead">Na = 11 — رتّب التوزيع الإلكتروني الصحيح بالضغط على البطاقات بالترتيب.</p>
+    <div class="panel" style="display:flex;flex-direction:column;align-items:center;gap:22px;">
+      <div class="card-pool" id="p5-pool"></div>
+      <div class="sequence" id="p5-seq"></div>
+      <div class="row">
+        <button class="btn btn-primary" onclick="checkPage5()">تحقق</button>
+        <button class="btn btn-ghost btn-sm" onclick="resetPage5()">إعادة المحاولة</button>
+        <button class="btn btn-ghost btn-sm" onclick="revealPage5()">عرض الإجابة</button>
+      </div>
+      <div class="feedback" id="p5-feedback"></div>
+      <div class="answer-box" id="p5-answer">الترتيب الصحيح: 2 → 8 → 1</div>
+    </div>
+  </div>`);
+  renderPage5Pool(wrap);
+  renderPage5Seq(wrap);
+  return wrap;
+}
+function renderPage5Pool(root){
+  const poolWrap = (root||document).querySelector('#p5-pool');
+  poolWrap.innerHTML='';
+  P5.pool.forEach(n=>{
+    const used = P5.selected.includes(n) && countOcc(P5.selected,n) >= countOcc(P5.pool,n);
+    const card = el(`<div class="num-card ${used?'used':''}" onclick="pickPage5(${n})">${n}</div>`);
+    poolWrap.appendChild(card);
+  });
+}
+function countOcc(arr,n){ return arr.filter(x=>x===n).length; }
+function renderPage5Seq(root){
+  const seqWrap=(root||document).querySelector('#p5-seq');
+  seqWrap.innerHTML='';
+  for(let i=0;i<3;i++){
+    const val = P5.selected[i];
+    const slot = el(`<div class="seq-slot ${val!==undefined?'filled':''}">${val!==undefined?val:''}</div>`);
+    seqWrap.appendChild(slot);
+    if(i<2) seqWrap.appendChild(el(`<div class="arrow">→</div>`));
+  }
+}
+function pickPage5(n){
+  if(P5.selected.length>=3) return;
+  P5.selected.push(n);
+  renderPage5Pool();
+  renderPage5Seq();
+}
+function resetPage5(){
+  P5.selected=[];
+  renderPage5Pool();
+  renderPage5Seq();
+  document.getElementById('p5-feedback').className='feedback';
+}
+function checkPage5(){
+  const ok = P5.selected.length===3 && P5.selected.every((v,i)=>v===P5.target[i]);
+  showFeedback('p5-feedback', ok, 'صحيح تمامًا! 2 → 8 → 1 ⚡', 'الترتيب غير صحيح، جرّب مرة أخرى.');
+}
+function revealPage5(){
+  P5.selected = [...P5.target];
+  renderPage5Pool();
+  renderPage5Seq();
+  showAnswerBox('p5-answer');
+}
+
+/* ============ PAGE 6 ============ */
+const P6_LIST = [11,12,15,16,17,18];
+const P6 = { idx:0 };
+function page6(){
+  const wrap = el(`<div class="stage">
+    <div class="eyebrow">اكتشف العنصر 🕵️</div>
+    <h1 class="page-title">من هو العنصر؟</h1>
+    <div class="chips" id="p6-chips"></div>
+    <div class="panel" style="display:flex;flex-direction:column;align-items:center;gap:20px;">
+      <p style="font-size:26px;font-weight:800;color:var(--amber);margin:0;" id="p6-dist"></p>
+      <input type="text" class="text-input" id="p6-input" placeholder="اكتب اسم العنصر أو رمزه">
+      <div class="row">
+        <button class="btn btn-primary" onclick="checkPage6()">تحقق</button>
+        <button class="btn btn-ghost btn-sm" onclick="revealPage6()">عرض الإجابة</button>
+      </div>
+      <div class="feedback" id="p6-feedback"></div>
+      <div class="answer-box" id="p6-answer"></div>
+    </div>
+  </div>`);
+  const chipsWrap = wrap.querySelector('#p6-chips');
+  P6_LIST.forEach((z,i)=>{
+    const dist = ELEMENTS[z].dist.join('|');
+    const chip = el(`<div class="chip ${i===P6.idx?'active':''}" onclick="setPage6Example(${i})">${dist}</div>`);
+    chipsWrap.appendChild(chip);
+  });
+  updatePage6(wrap);
+  return wrap;
+}
+function updatePage6(root){
+  const z = P6_LIST[P6.idx];
+  (root||document).querySelector('#p6-dist').textContent = ELEMENTS[z].dist.join(' | ');
+  const input=(root||document).querySelector('#p6-input');
+  if(input) input.value='';
+  const fb=(root||document).querySelector('#p6-feedback'); if(fb) fb.className='feedback';
+  const ab=(root||document).querySelector('#p6-answer'); if(ab) ab.className='answer-box';
+}
+function setPage6Example(i){
+  P6.idx=i;
+  document.querySelectorAll('#p6-chips .chip').forEach((c,idx)=>c.classList.toggle('active',idx===i));
+  updatePage6();
+}
+function checkPage6(){
+  const z = P6_LIST[P6.idx];
+  const data = ELEMENTS[z];
+  const input = normalize(document.getElementById('p6-input').value);
+  const ok = input.length>0 && (input===normalize(data.sym) || input===normalize(data.name));
+  showFeedback('p6-feedback', ok, `${data.name} ${data.sym} — العدد الذري ${z}`, 'احسب مجموع الإلكترونات أولًا.');
+}
+function revealPage6(){
+  const z = P6_LIST[P6.idx];
+  const data = ELEMENTS[z];
+  const box=document.getElementById('p6-answer');
+  box.textContent = `${data.name} (${data.sym}) — العدد الذري ${z}`;
+  box.classList.add('show');
+}
+
+/* ============ PAGE 7 ============ */
+const P7 = { step:0 };
+function page7(){
+  P7.step=0;
+  const wrap = el(`<div class="stage">
+    <div class="eyebrow">اربط التوزيع بالجدول الدوري</div>
+    <h1 class="page-title">ماذا يخبرنا التوزيع الإلكتروني؟</h1>
+    <div class="panel" style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+      <p style="font-size:26px;font-weight:800;color:var(--amber);margin:0;">2 | 8 | 7</p>
+
+      <div class="reveal-block show" id="p7-q1">
+        <div class="reveal-q">كم مستوى طاقة مشغول؟</div>
+        <input type="number" class="text-input" id="p7-a1" style="width:140px;">
+        <div class="row" style="margin-top:12px;">
+          <button class="btn btn-primary btn-sm" onclick="revealPage7(1)">تحقق واعرض</button>
+        </div>
+        <div class="reveal-a" id="p7-r1" style="display:none;margin-top:10px;">3 مستويات → الدورة الثالثة</div>
+      </div>
+
+      <div class="reveal-block" id="p7-q2">
+        <div class="reveal-q">كم إلكترونًا في المستوى الخارجي؟</div>
+        <input type="number" class="text-input" id="p7-a2" style="width:140px;">
+        <div class="row" style="margin-top:12px;">
+          <button class="btn btn-primary btn-sm" onclick="revealPage7(2)">تحقق واعرض</button>
+        </div>
+        <div class="reveal-a" id="p7-r2" style="display:none;margin-top:10px;">7 إلكترونات</div>
+      </div>
+
+      <div class="reveal-block" id="p7-q3">
+        <p style="color:var(--text-dim);font-size:15px;line-height:1.9;margin:0;">
+          الآن اربط ذلك بموقع العنصر في الجدول الدوري: عدد مستويات الطاقة المشغولة يحدد رقم الدورة، وعدد إلكترونات المستوى الخارجي يرتبط بالمجموعة بالنسبة للعناصر الممثلة.
+        </p>
+      </div>
+    </div>
+  </div>`);
+  return wrap;
+}
+function revealPage7(step){
+  if(step===1){
+    document.getElementById('p7-r1').style.display='block';
+    document.getElementById('p7-q2').classList.add('show');
+  } else if(step===2){
+    document.getElementById('p7-r2').style.display='block';
+    document.getElementById('p7-q3').classList.add('show');
+  }
+}
+
+/* ============ PAGE 8 ============ */
+const P8 = { active:1 };
+function page8(){
+  P8.active=1;
+  const wrap = el(`<div class="stage">
+    <div class="eyebrow">التحدي النهائي</div>
+    <h1 class="page-title">أثبت فهمك 🏁</h1>
+    <div class="tabs" id="p8-tabs">
+      <div class="tab active" onclick="setTask(1)">مهمة ١</div>
+      <div class="tab" onclick="setTask(2)">مهمة ٢</div>
+      <div class="tab" onclick="setTask(3)">مهمة ٣</div>
+    </div>
+    <div class="panel">
+      <div class="task-panel show" id="task1">
+        <div class="task-title">العدد الذري 15 — اكتب التوزيع الإلكتروني (مثال: 2|8|5)</div>
+        <input type="text" class="text-input" id="t1-input" placeholder="مثال: 2|8|5">
+        <div class="row">
+          <button class="btn btn-primary" onclick="checkTask1()">تحقق</button>
+          <button class="btn btn-ghost btn-sm" onclick="revealTask1()">عرض الإجابة</button>
+        </div>
+        <div class="feedback" id="t1-feedback"></div>
+        <div class="answer-box" id="t1-answer">الإجابة: 2 | 8 | 5</div>
+      </div>
+
+      <div class="task-panel" id="task2">
+        <div class="task-title">التوزيع 2|8|2 — أوجد عدد الإلكترونات الكلي</div>
+        <input type="number" class="text-input" id="t2-input" placeholder="العدد الكلي">
+        <div class="row">
+          <button class="btn btn-primary" onclick="checkTask2()">تحقق</button>
+          <button class="btn btn-ghost btn-sm" onclick="revealTask2()">عرض الإجابة</button>
+        </div>
+        <div class="feedback" id="t2-feedback"></div>
+        <div class="answer-box" id="t2-answer">الإجابة: 12</div>
+      </div>
+
+      <div class="task-panel" id="task3">
+        <div class="task-title">التوزيع 2|8|7 — أوجد عدد المستويات المشغولة وعدد إلكترونات المستوى الخارجي</div>
+        <div class="row">
+          <input type="number" class="text-input" id="t3-levels" style="width:170px;" placeholder="عدد المستويات">
+          <input type="number" class="text-input" id="t3-outer" style="width:170px;" placeholder="إلكترونات المستوى الخارجي">
+        </div>
+        <div class="row">
+          <button class="btn btn-primary" onclick="checkTask3()">تحقق</button>
+          <button class="btn btn-ghost btn-sm" onclick="revealTask3()">عرض الإجابة</button>
+        </div>
+        <div class="feedback" id="t3-feedback"></div>
+        <div class="answer-box" id="t3-answer">الإجابة: 3 مستويات — 7 إلكترونات</div>
+      </div>
+    </div>
+  </div>`);
+  return wrap;
+}
+function setTask(n){
+  P8.active=n;
+  document.querySelectorAll('#p8-tabs .tab').forEach((t,i)=>t.classList.toggle('active', i===n-1));
+  document.querySelectorAll('.task-panel').forEach(p=>p.classList.remove('show'));
+  document.getElementById('task'+n).classList.add('show');
+}
+function checkTask1(){
+  const v = document.getElementById('t1-input').value.replace(/\s/g,'');
+  const ok = v==='2|8|5' || v==='2,8,5' || v==='2-8-5';
+  showFeedback('t1-feedback', ok, 'صحيح! 2 | 8 | 5', 'راجع توزيع الإلكترونات على المستويات.');
+}
+function revealTask1(){ showAnswerBox('t1-answer'); }
+function checkTask2(){
+  const v = parseInt(document.getElementById('t2-input').value,10);
+  showFeedback('t2-feedback', v===12, 'صحيح! المجموع 12 إلكترونًا', 'اجمع الأعداد في كل المستويات.');
+}
+function revealTask2(){ showAnswerBox('t2-answer'); }
+function checkTask3(){
+  const lv = parseInt(document.getElementById('t3-levels').value,10);
+  const out = parseInt(document.getElementById('t3-outer').value,10);
+  const ok = lv===3 && out===7;
+  showFeedback('t3-feedback', ok, 'ممتاز! 3 مستويات و 7 إلكترونات في الخارجي', 'تحقق من عدد المستويات وعدد إلكترونات آخر مستوى.');
+}
+function revealTask3(){ showAnswerBox('t3-answer'); }
+
+/* ============ Page registry ============ */
+const PAGES = { 1:page1, 2:page2, 3:page3, 4:page4, 5:page5, 6:page6, 7:page7, 8:page8 };
+
+/* ============ Init ============ */
+render();
+</script>
+</body>
+</html>
