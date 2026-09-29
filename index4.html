@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مهمة داخل الجدول الدوري: اكتشف سر العناصر</title>
+<style>
+:root{
+  --ink:#10293A;
+  --ink-2:#3B5566;
+  --paper:#EEF3F5;
+  --panel:#FFFFFF;
+  --line:#C6D4DB;
+  --soft:#DDEBF0;
+  --teal:#0B7A75;
+  --teal-d:#075652;
+  --teal-l:#D6EEEB;
+  --amber:#F2A900;
+  --amber-l:#FFF1CC;
+  --coral:#C0392B;
+  --coral-l:#FBE4E1;
+  --green:#1B8A54;
+  --green-l:#DFF3E7;
+  --focus:#1A56DB;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html{font-size:clamp(16px,1.15vw + 7px,23px)}
+body{
+  margin:0;min-height:100vh;background:var(--paper);color:var(--ink);
+  font-family:"Segoe UI","Noto Sans Arabic","Noto Kufi Arabic","Tahoma","Arial",sans-serif;
+  line-height:1.7;-webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.sym{font-family:"Segoe UI","Arial",sans-serif;font-weight:700;unicode-bidi:isolate}
+.cfg{font-family:"Segoe UI","Arial",sans-serif;unicode-bidi:isolate;letter-spacing:.02em}
+sup,sub{line-height:0}
+
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+
+/* ---------- الرأس ---------- */
+.top{background:var(--panel);border-bottom:2px solid var(--line);padding:.55rem 1.2rem .65rem;flex:none}
+.top-row{display:flex;align-items:center;gap:1rem;margin-bottom:.5rem}
+.top-row h1{font-size:1.05rem;margin:0;font-weight:800;flex:1;color:var(--ink)}
+.top-row h1 small{font-weight:500;color:var(--ink-2);font-size:.8rem;margin-inline-start:.6rem}
+.home{border:2px solid var(--line);background:var(--panel);border-radius:10px;padding:.15rem .8rem;font-size:.85rem;font-weight:600}
+.home:hover{border-color:var(--teal);color:var(--teal-d)}
+.stepper{display:grid;grid-template-columns:repeat(5,1fr);gap:.55rem}
+.tile{
+  position:relative;text-align:center;border:2px solid var(--line);border-radius:10px;background:var(--panel);
+  padding:.35rem .4rem .3rem;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:3.1rem;
+  transition:background .2s,border-color .2s,color .2s;
+}
+.tile small{position:absolute;top:.15rem;inset-inline-start:.4rem;font-size:.7rem;font-weight:700;color:var(--ink-2)}
+.tile b{font-size:.92rem;font-weight:700;line-height:1.3}
+.tile.done{background:var(--teal-l);border-color:var(--teal)}
+.tile.current{background:var(--teal);border-color:var(--teal-d);color:#fff}
+.tile.current small{color:#CDEEEA}
+.tile.locked{opacity:.5;cursor:not-allowed}
+.tile:not(.locked):not(.current):hover{border-color:var(--teal)}
+.progress{display:flex;align-items:center;gap:.7rem;margin-top:.55rem}
+.bar{flex:1;height:.65rem;background:var(--soft);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--amber));border-radius:99px;transition:width .35s ease}
+.progress span{font-size:.85rem;font-weight:700;min-width:3rem;text-align:start;font-variant-numeric:tabular-nums}
+
+/* ---------- المشهد ---------- */
+.stage{flex:1;overflow:auto;padding:1.1rem 1.4rem}
+.screen{max-width:1240px;margin:0 auto;min-height:100%;animation:enter .22s ease-out}
+@keyframes enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:1.3rem;align-items:start}
+.grid2.narrow-vis{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)}
+.solo{max-width:900px;margin:0 auto}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:var(--radius);padding:1.1rem 1.3rem}
+.vis{display:flex;flex-direction:column;gap:.8rem}
+.vis .card{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.vis-title{font-weight:700;color:var(--ink-2);font-size:.9rem;margin:0 0 .3rem;text-align:center}
+
+/* الترحيب والمقدمات */
+.welcome{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,.7fr);gap:2rem;align-items:center;min-height:100%}
+.welcome h2{font-size:2.3rem;line-height:1.35;margin:0 0 .6rem;font-weight:800}
+.welcome .lead{font-size:1.15rem;color:var(--ink-2);margin:0 0 1.2rem;max-width:36em}
+.goals{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.goal{background:var(--panel);border:2px solid var(--line);border-inline-start:6px solid var(--teal);border-radius:12px;padding:.6rem .9rem;font-weight:600;font-size:.95rem;line-height:1.55}
+.mystery{
+  justify-self:center;width:min(15rem,100%);aspect-ratio:1/1.15;background:var(--panel);border:4px solid var(--ink);border-radius:18px;
+  position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:10px 10px 0 var(--amber);
+}
+.mystery small{position:absolute;top:.6rem;inset-inline-start:.9rem;font-size:1.1rem;font-weight:800}
+.mystery .big{font-size:6rem;font-weight:800;line-height:1;color:var(--teal)}
+.mystery .nm{font-weight:800;font-size:1.05rem;margin-top:.4rem}
+.mystery .mass{font-size:.8rem;color:var(--ink-2)}
+
+.intro{display:grid;grid-template-columns:auto minmax(0,1fr);gap:1.8rem;align-items:center;min-height:100%}
+.bigtile{
+  width:9rem;height:10.4rem;border:4px solid var(--ink);border-radius:16px;background:var(--panel);
+  position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:8px 8px 0 var(--teal);
+}
+.bigtile small{position:absolute;top:.5rem;inset-inline-start:.8rem;font-weight:800;font-size:1.15rem}
+.bigtile b{font-size:1.3rem;text-align:center;padding:0 .4rem;line-height:1.4}
+.bigtile .num{font-size:4.2rem;font-weight:800;line-height:1;color:var(--teal)}
+.intro h2{font-size:2.1rem;margin:0 0 .5rem;font-weight:800}
+.intro p{font-size:1.2rem;margin:0 0 .8rem;color:var(--ink-2);max-width:34em}
+.intro .meta{display:inline-block;background:var(--amber-l);border:2px solid var(--amber);border-radius:99px;padding:.1rem 1rem;font-weight:700;font-size:.95rem;color:var(--ink)}
+.intro .extra{margin-top:1rem}
+
+/* الأسئلة */
+.qpanel{display:flex;flex-direction:column;gap:.9rem}
+.qhead{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+.badge{background:var(--ink);color:#fff;border-radius:8px;padding:.05rem .7rem;font-size:.85rem;font-weight:700}
+.qcount{font-weight:700;color:var(--ink-2);font-size:.9rem}
+.dots{display:flex;gap:.3rem;margin-inline-start:auto}
+.dots i{width:.9rem;height:.4rem;border-radius:4px;background:var(--line)}
+.dots i.on{background:var(--teal)}
+.dots i.cur{background:var(--amber)}
+.qtext{font-size:1.45rem;font-weight:800;line-height:1.6;margin:0}
+.fillsentence{font-size:1.4rem;font-weight:700;line-height:2;margin:0;background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:.6rem 1rem}
+.blank{display:inline-block;min-width:8rem;text-align:center;border-bottom:4px solid var(--amber);margin:0 .3rem;padding:0 .5rem;color:var(--ink-2);font-weight:800}
+.blank.right{color:var(--green);border-color:var(--green)}
+.blank.wrong{color:var(--coral);border-color:var(--coral)}
+.opts{display:grid;gap:.65rem}
+.opts.tf{grid-template-columns:1fr 1fr}
+.opts.chips{grid-template-columns:repeat(auto-fit,minmax(11rem,1fr))}
+.opts.elements{grid-template-columns:repeat(auto-fit,minmax(9rem,1fr))}
+.opt{
+  display:flex;align-items:center;gap:.8rem;text-align:start;background:var(--panel);border:3px solid var(--line);border-radius:12px;
+  padding:.7rem 1rem;font-size:1.15rem;font-weight:600;line-height:1.55;min-height:3.4rem;transition:border-color .15s,background .15s,transform .1s;
+}
+.opt:not(:disabled):hover{border-color:var(--teal);background:#F6FBFA}
+.opt:not(:disabled):active{transform:scale(.99)}
+.opt .mark{flex:none;width:1.8rem;height:1.8rem;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:1rem;font-weight:800;color:transparent}
+.opt.right{border-color:var(--green);background:var(--green-l)}
+.opt.right .mark{background:var(--green);border-color:var(--green);color:#fff}
+.opt.wrong{border-color:var(--coral);background:var(--coral-l)}
+.opt.wrong .mark{background:var(--coral);border-color:var(--coral);color:#fff}
+.opt.struck{border-color:var(--coral);background:var(--coral-l);opacity:.75}
+.opt.struck .mark{background:var(--coral);border-color:var(--coral);color:#fff}
+.opt.struck .txt{text-decoration:line-through}
+.opt.dim{opacity:.55}
+.opt:disabled{cursor:default}
+.tf .opt{justify-content:center;font-size:1.5rem;font-weight:800;min-height:4.4rem}
+.chips .opt{justify-content:center}
+.etile{flex-direction:column;justify-content:center;gap:.05rem;text-align:center;min-height:7rem}
+.etile .esym{font-size:2.3rem;font-weight:800;line-height:1.1}
+.etile .nm{font-size:.95rem;font-weight:600;color:var(--ink-2)}
+.etile .cfg{font-size:1rem;color:var(--ink-2);font-weight:600}
+.etile .mark{position:absolute;top:.4rem;inset-inline-end:.4rem;width:1.5rem;height:1.5rem}
+.etile{position:relative}
+.fb{border-radius:12px;padding:.7rem 1rem;border:2px solid;font-size:1.05rem;line-height:1.7}
+.fb b{display:block;font-size:1.1rem;margin-bottom:.1rem}
+.fb p{margin:0}
+.fb.ok{background:var(--green-l);border-color:var(--green)}
+.fb.ok b{color:#0F6B3C}
+.fb.bad{background:var(--amber-l);border-color:var(--amber)}
+.fb.bad b{color:#7A5200}
+.fb.hint{background:var(--amber-l);border-color:var(--amber)}
+.fb.hint b{color:#7A5200}
+.fb .again{margin-top:.3rem;font-weight:700}
+
+/* بطاقات النشاط */
+.rel{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.relcard{background:var(--panel);border:3px solid var(--line);border-radius:var(--radius);padding:1rem 1.1rem;display:flex;flex-direction:column;gap:.6rem}
+.relcard.metal{border-top:8px solid var(--teal)}
+.relcard.nonmetal{border-top:8px solid var(--amber)}
+.relcard.ok{background:#F6FCF9}
+.relcard h3{margin:0;font-size:1.5rem;font-weight:800}
+.relcard .ex{margin:0;color:var(--ink-2);font-weight:600}
+.relcard .rq{margin:0;font-weight:700;font-size:1.05rem}
+.relcard .opts .opt{font-size:1.05rem;min-height:3rem;padding:.5rem .8rem}
+.relcard .fb{font-size:.98rem;padding:.5rem .8rem}
+.refcards{display:flex;flex-direction:column;gap:.8rem;width:100%}
+.refcard{border:2px solid var(--line);border-radius:12px;padding:.7rem 1rem;background:var(--panel)}
+.refcard.metal{border-inline-start:8px solid var(--teal)}
+.refcard.nonmetal{border-inline-start:8px solid var(--amber)}
+.refcard h3{margin:0;font-size:1.2rem}
+.refcard p{margin:.1rem 0 0;color:var(--ink-2);font-size:1rem}
+
+/* الذرات */
+.scene{display:flex;align-items:center;justify-content:center;gap:1rem;width:100%}
+.scene.v{flex-direction:column;gap:.3rem}
+.satom{margin:0;text-align:center;flex:none}
+.satom svg{width:clamp(130px,16vw,250px);height:auto;display:block;margin:0 auto}
+.scene.v .satom svg{width:clamp(110px,24vh,210px)}
+.satom figcaption{font-weight:700;font-size:1rem;line-height:1.4}
+.satom figcaption .sz{display:block;color:var(--ink-2);font-size:.92rem}
+.satom.revealed figcaption .sz{color:var(--teal-d);font-weight:800}
+.satom .ring{fill:none;stroke:var(--teal);stroke-width:3}
+.satom .ring.in{stroke:#7FBDB8;stroke-width:2}
+.satom .ring.out{stroke-dasharray:7 6;stroke:var(--ink-2)}
+.satom.revealed .ring.out{stroke-dasharray:none;stroke:var(--teal);fill:rgba(11,122,117,.07)}
+.satom .rings{opacity:0;transition:opacity .5s}
+.satom.revealed .rings{opacity:1}
+.satom .nuc{fill:var(--ink);opacity:0;transition:opacity .4s}
+.satom.revealed .nuc{opacity:1}
+.satom .qm{font-size:52px;font-weight:800;fill:var(--ink-2);text-anchor:middle;dominant-baseline:central;transition:opacity .3s}
+.satom.revealed .qm{opacity:0}
+.arrowbox{display:flex;flex-direction:column;align-items:center;gap:.2rem;color:var(--ink-2);font-weight:700;font-size:.9rem;text-align:center;max-width:9.5rem;flex:none}
+.arrowbox svg{width:6rem;height:2.2rem}
+.scene.v .arrowbox{flex-direction:row;max-width:none;gap:.6rem}
+.scene.v .arrowbox svg{width:2.2rem;height:4rem}
+.scene.v .arrowbox span{max-width:9rem}
+.arrowbox svg *{stroke:var(--amber);fill:var(--amber)}
+.arrowbox svg line{stroke-width:6;stroke-linecap:round}
+
+/* بوهر */
+.bohr{width:100%;height:auto;display:block}
+.bohr .shell{fill:none;stroke:#9DBAC4;stroke-width:1.6}
+.bohr .nuc{fill:var(--ink)}
+.bohr .e{fill:var(--teal)}
+.hot .bohr .e.out{fill:var(--amber);stroke:#9A6A00;stroke-width:1.4}
+.hot .bohr .shell.outer{stroke:var(--amber);stroke-width:2.6}
+
+/* مستكشف الدورة الثالثة */
+.p3grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem;width:100%;direction:ltr}
+.el{
+  position:relative;border:3px solid var(--line);background:var(--panel);border-radius:12px;padding:.25rem .3rem .3rem;text-align:center;
+  display:flex;flex-direction:column;align-items:center;min-height:5.6rem;justify-content:center;transition:border-color .15s,background .15s;
+}
+.el:hover{border-color:var(--teal)}
+.el.sel{border-color:var(--ink);background:var(--amber-l);box-shadow:4px 4px 0 var(--amber)}
+.el .z{position:absolute;top:.15rem;left:.4rem;font-size:.75rem;font-weight:700;color:var(--ink-2)}
+.el .esym{font-size:1.9rem;font-weight:800;line-height:1.1;margin-top:.5rem}
+.el .cfg{font-size:.95rem;font-weight:700;color:var(--ink-2)}
+.detail{width:100%;border:2px dashed var(--line);border-radius:12px;padding:.7rem;min-height:11rem;display:grid;grid-template-columns:8.5rem minmax(0,1fr);gap:.9rem;align-items:center}
+.detail.empty{display:flex;align-items:center;justify-content:center;text-align:center;color:var(--ink-2);font-weight:600}
+.detail .facts{display:flex;flex-direction:column;gap:.15rem}
+.detail h4{margin:0;font-size:1.25rem}
+.detail .outer{font-size:1.05rem;font-weight:700}
+.detail .outer strong{display:inline-block;background:var(--amber);color:var(--ink);border-radius:8px;padding:0 .6rem;margin:0 .2rem;font-size:1.3rem}
+.detail .loc{color:var(--ink-2);font-size:.95rem}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;width:100%;direction:ltr}
+.trio figure{margin:0;text-align:center;border:2px solid var(--line);border-radius:12px;padding:.5rem .3rem .6rem;background:var(--panel)}
+.trio figcaption{font-weight:700;line-height:1.4}
+.trio figcaption .sym{font-size:1.5rem;display:block}
+.trio figcaption .cfg{color:var(--ink-2);font-size:.95rem}
+.trio .caption-name{font-size:.95rem}
+.hint-line{margin:.5rem 0 0;color:var(--ink-2);font-size:.9rem;font-weight:600;text-align:center}
+
+/* الملخصات */
+.summary h2{font-size:1.9rem;margin:0 0 .3rem;font-weight:800}
+.summary .sub{margin:0 0 1rem;color:var(--ink-2);font-size:1.1rem}
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+.rule{background:var(--panel);border:3px solid var(--ink);border-radius:var(--radius);padding:1rem 1.2rem;box-shadow:6px 6px 0 var(--teal)}
+.rule:nth-child(2){box-shadow:6px 6px 0 var(--amber)}
+.rule svg{width:100%;height:auto;max-height:9.5rem;display:block;margin:0 auto .5rem}
+.rule svg .c{fill:var(--teal-l);stroke:var(--teal);stroke-width:3}
+.rule svg .a{stroke:var(--amber);fill:var(--amber)}
+.rule h3{margin:0;font-size:1.25rem}
+.rule .big{font-size:1.6rem;font-weight:800;margin:.1rem 0 .3rem;line-height:1.5}
+.rule .why{margin:0;color:var(--ink-2)}
+.chain{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-top:.5rem}
+.chain span{background:var(--soft);border-radius:8px;padding:.15rem .7rem;font-weight:700;font-size:.98rem}
+.chain i{font-style:normal;color:var(--amber);font-weight:800;font-size:1.2rem}
+.chain span.end{background:var(--teal);color:#fff}
+.note{margin-top:1rem;background:var(--amber-l);border:2px solid var(--amber);border-radius:12px;padding:.6rem 1rem;font-weight:600}
+.bars{display:grid;grid-template-columns:repeat(8,1fr);gap:.4rem;direction:ltr;align-items:end;margin:.3rem 0 1rem;background:var(--panel);border:2px solid var(--line);border-radius:12px;padding:.8rem .8rem .5rem}
+.bars div{text-align:center}
+.bars .col{height:9rem;display:flex;align-items:flex-end;justify-content:center}
+.bars .col i{display:flex;align-items:flex-start;justify-content:center;width:100%;border-radius:8px 8px 0 0;background:var(--teal);color:#fff;font-weight:800;font-style:normal;padding-top:.15rem;font-size:1.1rem}
+.bars .lab{font-weight:800;margin-top:.3rem}
+.bullets{margin:0;padding-inline-start:1.3rem;font-size:1.1rem}
+.bullets li{margin-bottom:.35rem}
+.ions{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-bottom:1rem}
+.ion{background:var(--panel);border:3px solid var(--ink);border-radius:12px;padding:.7rem;text-align:center;direction:ltr;font-size:1.25rem;font-weight:700}
+.ion small{display:block;direction:rtl;font-size:.9rem;color:var(--ink-2);margin-top:.2rem;font-weight:600}
+
+/* النتيجة */
+.result{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:1.5rem;align-items:center;min-height:100%}
+.ringbox{text-align:center}
+.ringbox svg{width:min(15rem,100%);height:auto}
+.ringbox .track{fill:none;stroke:var(--soft);stroke-width:14}
+.ringbox .val{fill:none;stroke:var(--teal);stroke-width:14;stroke-linecap:round;transform:rotate(-90deg);transform-origin:70px 70px;transition:stroke-dasharray .8s ease}
+.ringbox text{font-weight:800;text-anchor:middle;fill:var(--ink)}
+.result h2{margin:0 0 .3rem;font-size:2rem}
+.result .cheer{font-size:1.25rem;font-weight:600;margin:0 0 1rem}
+.counts{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem}
+.count{border:3px solid;border-radius:12px;padding:.5rem 1rem;background:var(--panel)}
+.count b{display:block;font-size:2rem;line-height:1.2}
+.count.g{border-color:var(--green)}
+.count.g b{color:var(--green)}
+.count.a{border-color:var(--amber)}
+.count.a b{color:#8A5F00}
+.review{margin:0 0 1rem;padding:0;list-style:none;display:grid;gap:.4rem}
+.review li{background:var(--panel);border:2px solid var(--line);border-inline-start:6px solid var(--amber);border-radius:10px;padding:.4rem .8rem;font-size:.98rem}
+.review li em{display:block;font-style:normal;color:var(--green);font-weight:700}
+.actions{display:flex;gap:.8rem;flex-wrap:wrap}
+
+/* الأزرار السفلية */
+.nav{flex:none;background:var(--panel);border-top:2px solid var(--line);padding:.7rem 1.2rem;display:flex;align-items:center;gap:.8rem}
+.navnote{flex:1;text-align:center;color:var(--ink-2);font-weight:600;font-size:.95rem}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:12px;border:3px solid var(--ink);
+  padding:.55rem 1.5rem;min-height:3.4rem;font-weight:800;font-size:1.15rem;background:var(--panel);transition:transform .1s,background .15s,box-shadow .15s;
+}
+.btn svg{width:1.2rem;height:1.2rem;flex:none}
+.btn:hover:not(:disabled){background:var(--soft)}
+.btn:active:not(:disabled){transform:translateY(2px)}
+.btn.primary{background:var(--teal);border-color:var(--teal-d);color:#fff;box-shadow:0 4px 0 var(--teal-d);padding-inline:2rem}
+.btn.primary:hover:not(:disabled){background:#0A6C67}
+.btn.primary:disabled{background:#9CB9B6;border-color:#8AA9A6;box-shadow:none;cursor:not-allowed;color:#F2F7F6}
+.btn.amber{background:var(--amber);border-color:#9A6A00;color:var(--ink);box-shadow:0 4px 0 #9A6A00}
+.btn.amber:hover:not(:disabled){background:#FFBE1F}
+.btn.gone{visibility:hidden}
+.btn.away{display:none}
+
+@media (max-width:900px){
+  .grid2,.grid2.narrow-vis,.welcome,.intro,.result,.rules,.rel{grid-template-columns:1fr}
+  .goals{grid-template-columns:1fr}
+  .tile b{font-size:.75rem}
+  .btn{padding-inline:1rem;font-size:1rem}
+  .bigtile{display:none}
+  .mystery{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="top-row">
+      <h1>مهمة داخل الجدول الدوري: اكتشف سر العناصر <small>كتاب الكيمياء – الصف التاسع – الصفحات 21–23</small></h1>
+      <button class="home" id="btnHome" type="button">العودة للبداية</button>
+    </div>
+    <nav class="stepper" id="stepper" aria-label="مراحل الدرس"></nav>
+    <div class="progress">
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="barWrap"><i id="barFill"></i></div>
+      <span id="barText">0%</span>
+    </div>
+  </header>
+
+  <main class="stage" id="stage"></main>
+
+  <footer class="nav">
+    <button class="btn" id="btnPrev" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      <span>السابق</span>
+    </button>
+    <button class="btn" id="btnRetry" type="button">إعادة المحاولة</button>
+    <span class="navnote" id="navNote"></span>
+    <button class="btn primary" id="btnNext" type="button">
+      <span id="nextLabel">التالي</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+  </footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ================= أدوات مساعدة ================= */
+var $ = function(s){ return document.querySelector(s); };
+var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function SYM(t){ return '<span class="sym" dir="ltr">'+t+'</span>'; }
+function CFG(arr){ return '<span class="cfg" dir="ltr">'+arr.join(', ')+'</span>'; }
+function shuffle(a){
+  var b=a.slice();
+  for(var i=b.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=b[i]; b[i]=b[j]; b[j]=t; }
+  return b;
+}
+var Li=SYM('Li'), Na=SYM('Na'), K=SYM('K'), Ne=SYM('Ne'), Be=SYM('Be'), Ba=SYM('Ba'), Mg=SYM('Mg'), Al=SYM('Al'), Cl=SYM('Cl'), F=SYM('F'), O=SYM('O'), Ca=SYM('Ca'), Ar=SYM('Ar');
+
+/* ================= رسم نموذج بوهر ================= */
+function bohr(c, label){
+  var n=c.length, sp = n>1 ? Math.min(19,(80-24)/(n-1)) : 0, R=24+sp*(n-1), vb=R+12;
+  var s='<svg class="bohr" viewBox="'+(-vb)+' '+(-vb)+' '+(vb*2)+' '+(vb*2)+'" role="img" aria-label="'+(label||'نموذج ذرة')+'">';
+  s+='<circle class="nuc" r="10"/>';
+  c.forEach(function(cnt,k){
+    var r=24+sp*k, outer=(k===n-1);
+    s+='<circle class="shell'+(outer?' outer':'')+'" r="'+r+'"/>';
+    for(var i=0;i<cnt;i++){
+      var a=-Math.PI/2+(2*Math.PI*i)/cnt+(k%2?Math.PI/cnt:0);
+      s+='<circle class="e'+(outer?' out':'')+'" cx="'+(r*Math.cos(a)).toFixed(1)+'" cy="'+(r*Math.sin(a)).toFixed(1)+'" r="4.7"/>';
+    }
+  });
+  return s+'</svg>';
+}
+
+/* ================= ذرات افتراضية بأحجام مختلفة ================= */
+var NEUTRAL_R=58;
+function sizeAtomHTML(a,i,revealed){
+  var inner='';
+  for(var k=0;k<a.n-1;k++){
+    var r=20+(a.R-20)*k/(a.n-1);
+    inner+='<circle class="ring in" cx="100" cy="100" r="'+r.toFixed(1)+'"/>';
+  }
+  var startR = revealed ? a.R : NEUTRAL_R;
+  return '<figure class="satom'+(revealed?' revealed':'')+'" data-R="'+a.R+'" data-word="'+a.word+'">'+
+    '<svg viewBox="0 0 200 200" aria-hidden="true"><g class="rings">'+inner+'</g>'+
+    '<circle class="ring out" cx="100" cy="100" r="'+startR+'"/>'+
+    '<circle class="nuc" cx="100" cy="100" r="9"/>'+
+    '<text class="qm" x="100" y="100">؟</text></svg>'+
+    '<figcaption>'+a.label+'<span class="sz">'+(revealed?a.word:'الحجم: ؟')+'</span></figcaption></figure>';
+}
+function arrowHTML(dir,text){
+  var svg = dir==='h'
+    ? '<svg viewBox="0 0 96 32" aria-hidden="true"><line x1="6" y1="16" x2="70" y2="16"/><polygon points="68,4 92,16 68,28"/></svg>'
+    : '<svg viewBox="0 0 32 64" aria-hidden="true"><line x1="16" y1="6" x2="16" y2="38"/><polygon points="4,36 16,60 28,36"/></svg>';
+  return '<div class="arrowbox">'+svg+'<span>'+text+'</span></div>';
+}
+function sizeSceneHTML(v,revealed){
+  var dir=v.layout;
+  return '<div class="scene '+dir+'" dir="ltr">'+
+    sizeAtomHTML(v.atoms[0],0,revealed)+arrowHTML(dir,v.arrow)+sizeAtomHTML(v.atoms[1],1,revealed)+'</div>';
+}
+function revealFigure(fig,animate){
+  var out=fig.querySelector('.ring.out'), R=parseFloat(fig.getAttribute('data-R'));
+  var word=fig.getAttribute('data-word');
+  fig.classList.add('revealed');
+  fig.querySelector('.sz').textContent=word;
+  if(!animate||REDUCED){ out.setAttribute('r',R); return; }
+  var t0=performance.now(), D=750;
+  function step(t){
+    var p=Math.min(1,(t-t0)/D), e=1-Math.pow(1-p,3);
+    out.setAttribute('r',(NEUTRAL_R+(R-NEUTRAL_R)*e).toFixed(2));
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* ================= بيانات العناصر ================= */
+var P3=[
+  {s:'Na',n:'الصوديوم',c:[2,8,1],z:11,type:'فلز'},
+  {s:'Mg',n:'المغنيسيوم',c:[2,8,2],z:12,type:'فلز'},
+  {s:'Al',n:'الألمنيوم',c:[2,8,3],z:13,type:'فلز'},
+  {s:'Si',n:'السيليكون',c:[2,8,4],z:14,type:'شبه فلز'},
+  {s:'P',n:'الفسفور',c:[2,8,5],z:15,type:'لافلز'},
+  {s:'S',n:'الكبريت',c:[2,8,6],z:16,type:'لافلز'},
+  {s:'Cl',n:'الكلور',c:[2,8,7],z:17,type:'لافلز'},
+  {s:'Ar',n:'الأرجون',c:[2,8,8],z:18,type:'غاز نبيل'}
+];
+var G1=[
+  {s:'Li',n:'الليثيوم',c:[2,1]},
+  {s:'Na',n:'الصوديوم',c:[2,8,1]},
+  {s:'K',n:'البوتاسيوم',c:[2,8,8,1]}
+];
+
+/* ================= المراحل والأسئلة ================= */
+var STAGES=[
+
+/* ---------- المرحلة 1 ---------- */
+{
+  tile:'الحجم الذري', title:'تحدي الحجم الذري',
+  goal:'ذرتان افتراضيتان تختلفان في الحجم. ما الذي يجعل ذرة أكبر من أخرى؟ سنكتشف كيف يتغير الحجم الذري في الدورة الواحدة وفي المجموعة الواحدة.',
+  count:'4 أسئلة',
+  extra:function(){
+    return '<div class="card" style="max-width:34rem">'+sizeSceneHTML({layout:'h',arrow:'ذرتان افتراضيتان',atoms:[
+      {label:'<b>ذرة (س)</b>',n:3,R:88,word:'كبيرة'},{label:'<b>ذرة (ع)</b>',n:2,R:46,word:'صغيرة'}]},true)+'</div>';
+  },
+  questions:[
+    {id:'s1q1',type:'mcq',fixed:true,badge:'الدورة الواحدة',
+     prompt:'عند الانتقال من اليسار إلى اليمين في الدورة الواحدة، ماذا يحدث للحجم الذري؟',
+     options:[{t:'يزداد'},{t:'يتناقص',ok:true},{t:'يبقى ثابتًا'}],
+     explain:'في الدورة الواحدة تبقى الإلكترونات في عدد المستويات نفسه، لكن شحنة النواة تزداد فتجذبها بقوة أكبر؛ فيتناقص الحجم الذري.',
+     vis:{kind:'size',title:'ذرتان افتراضيتان في دورة واحدة',layout:'h',arrow:'من اليسار إلى اليمين',atoms:[
+       {label:'<b>ذرة (س)</b> على اليسار',n:2,R:86,word:'أكبر'},{label:'<b>ذرة (ع)</b> على اليمين',n:2,R:44,word:'أصغر'}]}},
+    {id:'s1q2',type:'mcq',fixed:true,badge:'المجموعة الواحدة',
+     prompt:'عند الانتقال من الأعلى إلى الأسفل في المجموعة الواحدة، ماذا يحدث للحجم الذري؟',
+     options:[{t:'يزداد',ok:true},{t:'يتناقص'},{t:'يبقى ثابتًا'}],
+     explain:'كل عنصر أسفل المجموعة يضيف مستوى طاقة جديدًا، فيبتعد المستوى الخارجي عن النواة ويزداد الحجم الذري.',
+     vis:{kind:'size',title:'ذرتان افتراضيتان في مجموعة واحدة',layout:'v',arrow:'من الأعلى إلى الأسفل',atoms:[
+       {label:'<b>ذرة (س)</b> في الأعلى',n:2,R:46,word:'أصغر'},{label:'<b>ذرة (ع)</b> في الأسفل',n:4,R:92,word:'أكبر'}]}},
+    {id:'s1q3',type:'mcq',fixed:true,badge:'قارن',
+     prompt:'أيهما أكبر حجمًا: الليثيوم '+Li+' أم النيون '+Ne+'؟',
+     options:[{t:'الليثيوم '+Li,ok:true},{t:'النيون '+Ne}],
+     explain:'الليثيوم في بداية الدورة الثانية والنيون في نهايتها. بالانتقال إلى اليمين يتناقص الحجم الذري، فالليثيوم أكبر.',
+     vis:{kind:'size',title:'الدورة الثانية',layout:'h',arrow:'من '+Li+' إلى '+Ne,atoms:[
+       {label:'<b>الليثيوم</b> '+Li,n:2,R:86,word:'الأكبر'},{label:'<b>النيون</b> '+Ne,n:2,R:40,word:'الأصغر'}]}},
+    {id:'s1q4',type:'mcq',fixed:true,badge:'قارن',
+     prompt:'أيهما أكبر حجمًا: البيريليوم '+Be+' أم الباريوم '+Ba+'؟',
+     options:[{t:'البيريليوم '+Be},{t:'الباريوم '+Ba,ok:true}],
+     explain:'البيريليوم والباريوم في المجموعة الثانية نفسها. الباريوم أسفل البيريليوم وله مستويات طاقة أكثر، فحجمه الذري أكبر.',
+     vis:{kind:'size',title:'المجموعة الثانية',layout:'v',arrow:'من '+Be+' إلى '+Ba,atoms:[
+       {label:'<b>البيريليوم</b> '+Be,n:2,R:50,word:'الأصغر'},{label:'<b>الباريوم</b> '+Ba,n:6,R:94,word:'الأكبر'}]}}
+  ],
+  summary:function(){
+    var row='<svg viewBox="0 0 320 110" aria-hidden="true" direction="ltr"><circle class="c" cx="40" cy="55" r="36"/><circle class="c" cx="115" cy="55" r="30"/><circle class="c" cx="180" cy="55" r="24"/><circle class="c" cx="235" cy="55" r="18"/><circle class="c" cx="280" cy="55" r="12"/></svg>';
+    var col='<svg viewBox="0 0 320 110" aria-hidden="true"><circle class="c" cx="60" cy="18" r="10"/><circle class="c" cx="60" cy="44" r="16"/><circle class="c" cx="60" cy="80" r="24"/><line x1="140" y1="10" x2="140" y2="82" stroke="#F2A900" stroke-width="6" stroke-linecap="round"/><polygon class="a" points="128,78 140,104 152,78"/><text x="170" y="60" font-size="22" font-weight="800" fill="#10293A">إلى الأسفل</text></svg>';
+    return '<div class="rules">'+
+      '<article class="rule"><div dir="ltr">'+row+'</div><h3>القاعدة الأولى: في الدورة الواحدة</h3>'+
+      '<p class="big">من اليسار إلى اليمين يتناقص الحجم الذري</p>'+
+      '<p class="why">تزداد شحنة النواة فتجذب الإلكترونات أكثر.</p></article>'+
+      '<article class="rule"><div>'+col+'</div><h3>القاعدة الثانية: في المجموعة الواحدة</h3>'+
+      '<p class="big">من الأعلى إلى الأسفل يزداد الحجم الذري</p>'+
+      '<p class="why">يزداد عدد مستويات الطاقة فيبتعد المستوى الخارجي عن النواة.</p></article></div>'+
+      '<p class="note">الحجم الذري خاصية دورية: يمكن التنبؤ بحجم الذرة من موقع عنصرها في الجدول الدوري.</p>';
+  }
+},
+
+/* ---------- المرحلة 2 ---------- */
+{
+  tile:'النشاط الكيميائي', title:'لغز النشاط الكيميائي',
+  goal:'الحجم الذري يؤثر في النشاط الكيميائي، لكن تأثيره ليس واحدًا في الفلزات واللافلزات. سنحل اللغز خطوة بعد خطوة، وإذا أخطأت ستجد تلميحًا ثم تحاول من جديد.',
+  count:'4 أسئلة',
+  questions:[
+    {id:'s2q1',type:'multi',mode:'hint',fixed:true,badge:'اختر العلاقة',
+     prompt:'كلما زاد الحجم الذري (بالانتقال إلى أسفل المجموعة)، ماذا يحدث لنشاط كل نوع؟',
+     parts:[
+       {cls:'metal',title:'الفلزات',ex:Li+' · '+Na+' · '+K,
+        options:[{t:'يزداد النشاط',ok:true},{t:'يقل النشاط'},{t:'لا يتغير النشاط'}],
+        hint:'الفلز ينشط بفقد إلكترونات مستواه الخارجي. هل يسهل فقد إلكترون بعيد عن النواة أم يصعب؟',
+        okmsg:'صحيح: كلما ابتعد المستوى الخارجي عن النواة سهل فقد إلكتروناته.'},
+       {cls:'nonmetal',title:'اللافلزات',ex:F+' · '+Cl,
+        options:[{t:'يزداد النشاط'},{t:'يقل النشاط',ok:true},{t:'لا يتغير النشاط'}],
+        hint:'اللافلز ينشط باكتساب الإلكترونات أو جذبها. هل تجذب النواة إلكترونًا بعيدًا عنها بسهولة؟',
+        okmsg:'صحيح: كلما كبرت الذرة ضعف جذب النواة للإلكترونات فيقل النشاط.'}],
+     explain:'العلاقة معاكسة: في الفلزات يزداد النشاط بزيادة الحجم لأن الفقد أسهل، وفي اللافلزات يقل بزيادة الحجم لأن الجذب أضعف.'},
+    {id:'s2q2',type:'mcq',mode:'hint',fixed:false,badge:'اختر السبب',
+     prompt:'يزداد نشاط الفلزات عند الانتقال إلى أسفل المجموعة بسبب:',
+     options:[{t:'سهولة فقد إلكترونات المستوى الخارجي',ok:true},{t:'صعوبة فقد الإلكترونات'},{t:'زيادة عدد البروتونات فقط'}],
+     hint:'أسفل المجموعة يكون المستوى الخارجي أبعد عن النواة. ماذا يحدث لقوة جذب النواة لإلكتروناته؟',
+     explain:'كلما كبرت الذرة صار المستوى الخارجي أبعد عن النواة، فيسهل فقد إلكتروناته ويزداد نشاط الفلز.'},
+    {id:'s2q3',type:'mcq',mode:'hint',fixed:false,badge:'اختر السبب',
+     prompt:'يزداد نشاط اللافلزات عند الانتقال إلى أعلى المجموعة بسبب:',
+     options:[{t:'زيادة الحجم الذري'},{t:'سهولة اكتساب الإلكترونات أو جذبها',ok:true},{t:'فقد الإلكترونات بسهولة'}],
+     hint:'أعلى المجموعة تكون الذرة أصغر. هل جذب النواة للإلكترونات هناك أقوى أم أضعف؟',
+     explain:'أعلى المجموعة تكون الذرة أصغر، فتجذب النواة الإلكترونات بقوة أكبر ويسهل اكتسابها؛ لذلك يزداد نشاط اللافلز.'},
+    {id:'s2q4',type:'mcq',mode:'hint',fixed:false,badge:'سؤال تفكير',
+     prompt:'لماذا تختلف علاقة الحجم الذري بالنشاط الكيميائي بين الفلزات واللافلزات؟',
+     options:[
+       {t:'لأن الفلزات تنشط بفقد الإلكترونات واللافلزات تنشط باكتسابها، والحجم يؤثر في كل منهما بشكل معاكس',ok:true},
+       {t:'لأن عدد إلكترونات المستوى الخارجي ثابت في الفلزات واللافلزات'},
+       {t:'لأن الفلزات أكبر حجمًا من اللافلزات في كل الحالات'}],
+     hint:'فكّر: ماذا يفعل كل نوع بالإلكترونات، هل يفقدها أم يكتسبها؟ وكيف يؤثر بعد المستوى الخارجي في كل حالة؟',
+     explain:'النشاط عند الفلزات مرتبط بسهولة الفقد، وعند اللافلزات بسهولة الاكتساب. الذرة الكبيرة تفقد بسهولة لكنها تجذب بضعف، فتنعكس العلاقة.'}
+  ],
+  refVis:function(){
+    return '<div class="refcards">'+
+      '<div class="refcard metal"><h3>الفلزات</h3><p>ينشط الفلز بفقد إلكترونات مستواه الخارجي.</p></div>'+
+      '<div class="refcard nonmetal"><h3>اللافلزات</h3><p>ينشط اللافلز باكتساب الإلكترونات أو جذبها.</p></div></div>';
+  },
+  summary:function(){
+    return '<div class="rules">'+
+      '<article class="rule"><h3>الفلزات</h3><div class="chain"><span>أسفل المجموعة</span><i>‹</i><span>أكبر حجمًا</span><i>‹</i><span>المستوى الخارجي أبعد</span><i>‹</i><span>فقد أسهل</span><i>‹</i><span class="end">أنشط</span></div>'+
+      '<p class="why" style="margin-top:.7rem">وفي الدورة الواحدة يقل نشاط الفلزات من اليسار إلى اليمين.</p></article>'+
+      '<article class="rule"><h3>اللافلزات</h3><div class="chain"><span>أعلى المجموعة</span><i>‹</i><span>أصغر حجمًا</span><i>‹</i><span>جذب أقوى</span><i>‹</i><span>اكتساب أسهل</span><i>‹</i><span class="end">أنشط</span></div>'+
+      '<p class="why" style="margin-top:.7rem">وفي الدورة الواحدة يزداد نشاط اللافلزات باتجاه اليمين.</p></article></div>'+
+      '<p class="note">الحجم الذري نفسه يعطي نتيجتين مختلفتين: يزيد نشاط الفلزات ويقلل نشاط اللافلزات.</p>';
+  }
+},
+
+/* ---------- المرحلة 3 ---------- */
+{
+  tile:'اكتشف النمط', title:'اكتشف النمط',
+  goal:'انظر إلى التوزيع الإلكتروني لعناصر الدورة الثالثة من الصوديوم إلى الأرجون. انقر على أي عنصر لترى عدد إلكترونات مستواه الخارجي، ثم ابحث عن النمط.',
+  count:'5 أسئلة',
+  questions:[
+    {id:'s3q1',type:'mcq',fixed:true,badge:'اكتشف',
+     prompt:'كم عدد مستويات الطاقة في عناصر الدورة الثالثة؟',
+     options:[{t:'2'},{t:'3',ok:true},{t:'4'}],
+     explain:'لكل عنصر في الدورة الثالثة 3 مستويات طاقة: يمتلئ الأول بإلكترونين والثاني بثمانية، ويحتوي الثالث على الإلكترونات المتبقية.',vis:{kind:'p3'}},
+    {id:'s3q2',type:'mcq',fixed:false,badge:'اكتشف',
+     prompt:'ما الذي يتغير تدريجيًا من الصوديوم إلى الأرجون؟',
+     options:[{t:'عدد مستويات الطاقة'},{t:'عدد إلكترونات المستوى الخارجي',ok:true},{t:'عدد إلكترونات المستوى الأول'}],
+     explain:'المستويان الأول والثاني ثابتان (2 و8)، أما إلكترونات المستوى الثالث (الخارجي) فتزداد من 1 إلى 8.',vis:{kind:'p3'}},
+    {id:'s3q3',type:'mcq',fixed:false,badge:'اكتشف',
+     prompt:'أي عنصر يمتلك إلكترونًا واحدًا في المستوى الخارجي؟',
+     options:[{t:'الصوديوم '+Na,ok:true},{t:'المغنيسيوم '+Mg},{t:'الألمنيوم '+Al},{t:'الكلور '+Cl}],
+     explain:'الصوديوم توزيعه 2, 8, 1، أي إلكترون واحد في المستوى الخارجي، لذلك يقع في المجموعة الأولى.',vis:{kind:'p3'}},
+    {id:'s3q4',type:'mcq',fixed:false,badge:'اكتشف',
+     prompt:'أي عنصر يمتلك سبعة إلكترونات في المستوى الخارجي؟',
+     options:[{t:'الفسفور '+SYM('P')},{t:'الكبريت '+SYM('S')},{t:'الكلور '+Cl,ok:true},{t:'الأرجون '+Ar}],
+     explain:'الكلور توزيعه 2, 8, 7، أي سبعة إلكترونات في المستوى الخارجي، لذلك يقع في المجموعة السابعة.',vis:{kind:'p3'}},
+    {id:'s3q5',type:'mcq',fixed:false,badge:'فسّر',
+     prompt:'لماذا يتشابه الصوديوم '+Na+' والبوتاسيوم '+K+' في بعض خصائصهما الكيميائية؟',
+     options:[
+       {t:'لأن لكل منهما إلكترونًا واحدًا في المستوى الخارجي',ok:true},
+       {t:'لأن لهما عدد مستويات الطاقة نفسه'},
+       {t:'لأن لهما الحجم الذري نفسه'}],
+     explain:'الصوديوم (2, 8, 1) والبوتاسيوم (2, 8, 8, 1) لكل منهما إلكترون واحد في المستوى الخارجي، فيتشابه سلوكهما الكيميائي وهما في المجموعة نفسها.',vis:{kind:'p3'}}
+  ],
+  summary:function(){
+    var bars='<div class="bars" aria-label="عدد إلكترونات المستوى الخارجي">';
+    P3.forEach(function(e){
+      var n=e.c[2];
+      bars+='<div><div class="col"><i style="height:'+(n/8*100)+'%">'+n+'</i></div><div class="lab">'+SYM(e.s)+'</div></div>';
+    });
+    bars+='</div>';
+    return bars+'<ul class="bullets">'+
+      '<li>لعناصر الدورة الثالثة <b>3 مستويات طاقة</b>، ويزداد عدد إلكترونات المستوى الخارجي من 1 إلى 8.</li>'+
+      '<li>عدد إلكترونات المستوى الخارجي يحدد <b>رقم المجموعة</b>: '+Na+' في المجموعة الأولى و'+Cl+' في المجموعة السابعة.</li>'+
+      '<li>'+Na+' و'+Mg+' و'+Al+' <b>فلزات</b> يقل نشاطها باتجاه اليمين، و'+SYM('Si')+' شبه فلز، و'+SYM('P')+' و'+SYM('S')+' و'+Cl+' <b>لافلزات</b> يزداد نشاطها باتجاه اليمين.</li></ul>';
+  }
+},
+
+/* ---------- المرحلة 4 ---------- */
+{
+  tile:'المجموعة الأولى', title:'تحدي المجموعة الأولى',
+  goal:'ثلاثة عناصر من المجموعة الأولى: الليثيوم والصوديوم والبوتاسيوم. لاحظ توزيعها الإلكتروني ثم أجب: ما العامل المشترك بينها؟',
+  count:'سؤال واحد',
+  questions:[
+    {id:'s4q1',type:'mcq',fixed:false,badge:'اكتشف',
+     prompt:'ما العامل المشترك بين هذه العناصر؟',
+     options:[
+       {t:'لها عدد مستويات الطاقة نفسه'},
+       {t:'لكل منها إلكترون واحد في المستوى الخارجي',ok:true},
+       {t:'لها الحجم الذري نفسه'}],
+     explain:'تمتلك جميعها إلكترونًا واحدًا في المستوى الخارجي، وتميل إلى فقده وتكوين أيونات موجبة أحادية الشحنة، ولذلك تتشابه في خصائصها الكيميائية.',
+     vis:{kind:'g1'}}
+  ],
+  summary:function(){
+    return '<div class="ions">'+
+      '<div class="ion">Li &rarr; Li<sup>+</sup> + e<sup>&minus;</sup><small>الليثيوم</small></div>'+
+      '<div class="ion">Na &rarr; Na<sup>+</sup> + e<sup>&minus;</sup><small>الصوديوم</small></div>'+
+      '<div class="ion">K &rarr; K<sup>+</sup> + e<sup>&minus;</sup><small>البوتاسيوم</small></div></div>'+
+      '<ul class="bullets">'+
+      '<li>عناصر المجموعة الأولى تفقد إلكترونها الخارجي الوحيد وتكوّن أيونًا موجبًا شحنته (+1).</li>'+
+      '<li>يزداد الحجم الذري من '+Li+' إلى '+K+'، فيسهل فقد الإلكترون ويزداد النشاط.</li>'+
+      '<li>مع الماء: الليثيوم يتفاعل ببطء، والصوديوم بشدة، والبوتاسيوم أشد تفاعلًا من الصوديوم.</li></ul>';
+  }
+},
+
+/* ---------- المرحلة 5: الاختبار ---------- */
+{
+  tile:'الاختبار النهائي', title:'الاختبار النهائي',
+  goal:'ثمانية أسئلة متنوعة تختبر فهمك وتطبيقك لما اكتشفته. بعد كل إجابة ستجد تغذية راجعة قصيرة، وفي النهاية تظهر نتيجتك.',
+  count:'8 أسئلة',
+  exam:true,
+  questions:[
+    {id:'e1',type:'mcq',fixed:false,badge:'اختيار من متعدد',
+     prompt:'أي العناصر الآتية له أصغر حجم ذري؟',
+     options:[{t:Na},{t:Mg},{t:Al},{t:Cl,ok:true}],
+     explain:'جميعها في الدورة الثالثة، والحجم الذري يتناقص باتجاه اليمين؛ فالكلور الأبعد يمينًا هو الأصغر.'},
+    {id:'e2',type:'tf',fixed:true,badge:'صح أم خطأ',
+     prompt:'الحجم الذري للصوديوم '+Na+' أصغر من الحجم الذري للألمنيوم '+Al+'.',
+     options:[{t:'صح'},{t:'خطأ',ok:true}],
+     explain:'الصوديوم على يسار الألمنيوم في الدورة نفسها، لذلك حجمه الذري أكبر.'},
+    {id:'e3',type:'fill',fixed:false,badge:'أكمل الفراغ',
+     prompt:'أكمل الجملة الآتية:',
+     fill:['تتشابه عناصر المجموعة الواحدة في خصائصها الكيميائية لأن لها العدد نفسه من إلكترونات ','.'],
+     options:[{t:'المستوى الخارجي',ok:true},{t:'المستوى الأول'},{t:'المستوى الثاني'}],
+     explain:'الخصائص الكيميائية تعتمد على إلكترونات المستوى الخارجي، وعناصر المجموعة الواحدة لها العدد نفسه منها.'},
+    {id:'e4',type:'element',fixed:false,badge:'اختر العنصر',
+     prompt:'أي العناصر الآتية هو أنشط اللافلزات؟',
+     options:[{sym:'O',nm:'الأكسجين',c:[2,6]},{sym:'F',nm:'الفلور',c:[2,7],ok:true},{sym:'Cl',nm:'الكلور',c:[2,8,7]}],
+     explain:'الفلور أصغر من الكلور في المجموعة نفسها (أعلى المجموعة)، وأنشط من الأكسجين لأنه على يمينه في الدورة نفسها؛ لذلك جذبه للإلكترونات هو الأقوى.'},
+    {id:'e5',type:'mcq',fixed:false,badge:'تفسير علمي',
+     prompt:'لماذا يقل نشاط الفلزات عند الانتقال من الصوديوم إلى الألمنيوم في الدورة الثالثة؟',
+     options:[
+       {t:'لأن الحجم الذري يتناقص فيصعب فقد إلكترونات المستوى الخارجي',ok:true},
+       {t:'لأن عدد مستويات الطاقة يزداد فيبتعد المستوى الخارجي عن النواة'},
+       {t:'لأن الفلزات تكتسب الإلكترونات بصعوبة أكبر'}],
+     explain:'باتجاه اليمين تزداد شحنة النواة ويتناقص الحجم الذري، فتزداد قوة جذب النواة لإلكتروناتها ويصعب فقدها.'},
+    {id:'e6',type:'mcq',fixed:false,badge:'توقع من التوزيع الإلكتروني',
+     prompt:'عنصر توزيعه الإلكتروني '+CFG([2,8,3])+'. أين تتوقع موقعه في الجدول الدوري؟',
+     options:[
+       {t:'الدورة الثالثة، المجموعة الثالثة',ok:true},
+       {t:'الدورة الثانية، المجموعة الثالثة'},
+       {t:'الدورة الثالثة، المجموعة الثانية'},
+       {t:'الدورة الرابعة، المجموعة الثالثة'}],
+     explain:'ثلاثة مستويات طاقة تعني الدورة الثالثة، وثلاثة إلكترونات في المستوى الخارجي تعني المجموعة الثالثة.'},
+    {id:'e7',type:'tf',fixed:true,badge:'توقع من التوزيع الإلكتروني',
+     prompt:'العنصر الذي توزيعه '+CFG([2,8,8,1])+' أنشط كيميائيًا من العنصر الذي توزيعه '+CFG([2,8,1])+'.',
+     options:[{t:'صح',ok:true},{t:'خطأ'}],
+     explain:'الأول هو البوتاسيوم والثاني الصوديوم، وهما في المجموعة نفسها. البوتاسيوم أكبر حجمًا فيفقد إلكترونه أسهل وأنشط.'},
+    {id:'e8',type:'fill',fixed:false,badge:'أكمل الفراغ',
+     prompt:'أكمل الجملة الآتية:',
+     fill:['كلما انتقلنا من اليسار إلى اليمين في الدورة الواحدة ',' عدد إلكترونات المستوى الخارجي.'],
+     options:[{t:'يزداد',ok:true},{t:'يقل'},{t:'يبقى ثابتًا'}],
+     explain:'في الدورة الثالثة مثلًا يزداد عدد إلكترونات المستوى الخارجي من 1 في الصوديوم إلى 8 في الأرجون.'}
+  ]
+}
+];
+
+/* ================= بناء قائمة الشاشات ================= */
+var SCREENS=[{kind:'welcome',stage:-1}];
+var STAGE_START=[];
+STAGES.forEach(function(st,si){
+  STAGE_START[si]=SCREENS.length;
+  SCREENS.push({kind:'intro',stage:si});
+  st.questions.forEach(function(q,qi){ SCREENS.push({kind:'q',stage:si,q:q,qi:qi}); });
+  if(st.summary) SCREENS.push({kind:'summary',stage:si});
+});
+SCREENS.push({kind:'result',stage:4});
+var LAST=SCREENS.length-1;
+var EXAM_FIRST=STAGE_START[4]+1;
+
+/* ================= الحالة ================= */
+var state={idx:0,max:0,ans:{},sel3:null};
+
+function newAns(q){
+  if(q.type==='multi'){
+    return {parts:q.parts.map(function(){return {wrong:[],done:false,picked:null};}),done:false,correct:null};
+  }
+  var idxs=q.options.map(function(_,i){return i;});
+  return {order:q.fixed?idxs:shuffle(idxs),picked:null,wrong:[],done:false,correct:null};
+}
+function A(q){ if(!state.ans[q.id]) state.ans[q.id]=newAns(q); return state.ans[q.id]; }
+function resolved(scr){
+  if(scr.kind!=='q') return true;
+  var a=state.ans[scr.q.id];
+  return !!(a&&a.done);
+}
+
+/* ================= رسم الشاشات ================= */
+var stageEl=$('#stage');
+
+function qLabelFor(scr){
+  var st=STAGES[scr.stage];
+  return 'السؤال '+(scr.qi+1)+' من '+st.questions.length;
+}
+function dotsFor(scr){
+  var st=STAGES[scr.stage], h='<div class="dots" aria-hidden="true">';
+  st.questions.forEach(function(q,i){
+    var a=state.ans[q.id], cls=(a&&a.done)?'on':'';
+    if(i===scr.qi) cls='cur';
+    h+='<i class="'+cls+'"></i>';
+  });
+  return h+'</div>';
+}
+
+function optionsHTML(q,a){
+  var h='', i, oi, o, cls, mark, dis;
+  if(q.type==='fill'){
+    var blankTxt='……………', bcls='';
+    if(a.picked!==null){ blankTxt=q.options[a.picked].t; bcls=q.options[a.picked].ok?' right':' wrong'; }
+    h+='<p class="fillsentence">'+q.fill[0]+'<span class="blank'+bcls+'">'+blankTxt+'</span>'+q.fill[1]+'</p>';
+  }
+  var kind = q.type==='tf'?'tf':(q.type==='fill'?'chips':(q.type==='element'?'elements':''));
+  h+='<div class="opts '+kind+'" role="group" aria-label="الخيارات">';
+  for(i=0;i<a.order.length;i++){
+    oi=a.order[i]; o=q.options[oi]; cls=''; mark=''; dis='';
+    if(a.done){
+      dis=' disabled';
+      if(o.ok){cls=' right'; mark='✓';}
+      else if(oi===a.picked){cls=' wrong'; mark='✗';}
+      else cls=' dim';
+    } else if(a.wrong.indexOf(oi)>-1){
+      cls=' struck'; mark='✗'; dis=' disabled';
+    }
+    var inner;
+    if(q.type==='element'){
+      inner='<span class="mark" aria-hidden="true">'+mark+'</span><span class="esym sym" dir="ltr">'+o.sym+'</span><span class="nm">'+o.nm+'</span>'+CFG(o.c);
+    } else {
+      inner='<span class="mark" aria-hidden="true">'+mark+'</span><span class="txt">'+o.t+'</span>';
+    }
+    h+='<button type="button" class="opt'+(q.type==='element'?' etile':'')+cls+'" data-oi="'+oi+'"'+dis+'>'+inner+'</button>';
+  }
+  return h+'</div>';
+}
+
+function multiHTML(q,a){
+  var h='<div class="rel">';
+  q.parts.forEach(function(p,pi){
+    var pa=a.parts[pi], i, o, cls, mark, dis, fb='';
+    h+='<div class="relcard '+p.cls+(pa.done?' ok':'')+'"><h3>'+p.title+'</h3><p class="ex">'+p.ex+'</p><p class="rq">عند زيادة الحجم الذري:</p><div class="opts">';
+    for(i=0;i<p.options.length;i++){
+      o=p.options[i]; cls=''; mark=''; dis='';
+      if(pa.done){
+        dis=' disabled';
+        if(o.ok){cls=' right';mark='✓';} else cls=' dim';
+      } else if(pa.wrong.indexOf(i)>-1){cls=' struck';mark='✗';dis=' disabled';}
+      h+='<button type="button" class="opt'+cls+'" data-part="'+pi+'" data-oi="'+i+'"'+dis+'><span class="mark" aria-hidden="true">'+mark+'</span><span class="txt">'+o.t+'</span></button>';
+    }
+    h+='</div>';
+    if(pa.done) fb='<div class="fb ok" role="status"><p>'+p.okmsg+'</p></div>';
+    else if(pa.wrong.length) fb='<div class="fb hint" role="status"><b>تلميح</b><p>'+p.hint+'</p><p class="again">جرّب اختيارًا آخر.</p></div>';
+    h+=fb+'</div>';
+  });
+  return h+'</div>';
+}
+
+function feedbackHTML(q,a){
+  if(a.done){
+    var ok=a.correct!==false;
+    return '<div class="fb '+(ok?'ok':'bad')+'" role="status"><b>'+(ok?'إجابة صحيحة':'راجع الفكرة')+'</b><p>'+q.explain+'</p></div>';
+  }
+  if(q.mode==='hint' && a.wrong.length){
+    return '<div class="fb hint" role="status"><b>تلميح</b><p>'+q.hint+'</p><p class="again">جرّب اختيارًا آخر.</p></div>';
+  }
+  return '';
+}
+
+function qPanelHTML(scr){
+  var q=scr.q, a=A(q), h='';
+  h+='<div class="qhead"><span class="badge">'+q.badge+'</span><span class="qcount">'+qLabelFor(scr)+'</span>'+dotsFor(scr)+'</div>';
+  h+='<h2 class="qtext">'+q.prompt+'</h2>';
+  if(q.type==='multi'){
+    h+=multiHTML(q,a);
+    if(a.done) h+='<div class="fb ok" role="status"><b>أحسنت، حللت اللغز</b><p>'+q.explain+'</p></div>';
+  } else {
+    h+=optionsHTML(q,a)+feedbackHTML(q,a);
+  }
+  return h;
+}
+
+/* --- المستكشف واللوحات المرئية --- */
+function p3VisHTML(){
+  var h='<h3 class="vis-title">عناصر الدورة الثالثة: انقر على أي عنصر</h3><div class="p3grid">';
+  P3.forEach(function(e){
+    h+='<button type="button" class="el'+(state.sel3===e.s?' sel':'')+'" data-el="'+e.s+'"><span class="z">'+e.z+'</span><span class="esym sym" dir="ltr">'+e.s+'</span>'+CFG(e.c)+'</button>';
+  });
+  h+='</div><div class="detail empty" id="p3detail">'+p3DetailInner()+'</div>';
+  return h;
+}
+function p3DetailInner(){
+  var e=null;
+  P3.forEach(function(x){ if(x.s===state.sel3) e=x; });
+  if(!e) return 'انقر على أي بطاقة لترى عدد إلكترونات مستواه الخارجي';
+  return '__DETAIL__';
+}
+function updateP3Detail(){
+  var box=$('#p3detail'); if(!box) return;
+  var e=null; P3.forEach(function(x){ if(x.s===state.sel3) e=x; });
+  Array.prototype.forEach.call(document.querySelectorAll('.el'),function(b){
+    b.classList.toggle('sel',b.getAttribute('data-el')===state.sel3);
+  });
+  if(!e){ box.className='detail empty'; box.textContent='انقر على أي بطاقة لترى عدد إلكترونات مستواه الخارجي'; return; }
+  box.className='detail hot';
+  box.innerHTML='<div>'+bohr(e.c,'نموذج ذرة '+e.n)+'</div><div class="facts"><h4>'+e.n+' '+SYM(e.s)+'</h4>'+
+    '<div class="outer">إلكترونات المستوى الخارجي:<strong>'+e.c[2]+'</strong></div>'+
+    '<div class="loc">مستويات الطاقة: '+e.c.length+' · الدورة 3 · المجموعة '+e.c[2]+'</div>'+
+    '<div class="loc">'+e.type+'</div></div>';
+}
+function g1VisHTML(hot){
+  var h='<h3 class="vis-title">عناصر المجموعة الأولى</h3><div class="trio '+(hot?'hot':'')+'" id="g1trio">';
+  G1.forEach(function(e){
+    h+='<figure>'+bohr(e.c,'نموذج ذرة '+e.n)+'<figcaption>'+SYM(e.s)+'<span class="caption-name">'+e.n+'</span>'+CFG(e.c)+'</figcaption></figure>';
+  });
+  return h+'</div><p class="hint-line">لاحظ أعداد الإلكترونات في كل مستوى</p>';
+}
+
+function visHTML(scr,a){
+  var v=scr.q.vis, st=STAGES[scr.stage];
+  if(v){
+    if(v.kind==='size') return '<h3 class="vis-title">'+v.title+'</h3>'+sizeSceneHTML(v,a.done);
+    if(v.kind==='p3') return p3VisHTML();
+    if(v.kind==='g1') return g1VisHTML(a.done);
+  }
+  if(st.refVis) return st.refVis();
+  return '';
+}
+
+function renderQuestion(scr){
+  var q=scr.q, a=A(q), v=q.vis, st=STAGES[scr.stage];
+  var hasVis=!!(v||st.refVis);
+  var html='';
+  if(hasVis){
+    var narrow = v && v.kind==='size' ? '' : '';
+    html='<div class="screen"><div class="grid2'+narrow+'"><div class="vis"><div class="card" id="visBox">'+visHTML(scr,a)+'</div></div><div class="qpanel" id="qpanel">'+qPanelHTML(scr)+'</div></div></div>';
+  } else {
+    html='<div class="screen"><div class="solo"><div class="qpanel" id="qpanel">'+qPanelHTML(scr)+'</div></div></div>';
+  }
+  stageEl.innerHTML=html;
+  if(v && v.kind==='p3') updateP3Detail();
+}
+
+function renderWelcome(){
+  stageEl.innerHTML='<div class="screen"><div class="welcome"><div>'+
+    '<h2>مهمة داخل الجدول الدوري: اكتشف سر العناصر</h2>'+
+    '<p class="lead">لكل عنصر موقع في الجدول الدوري، وهذا الموقع يكشف حجم ذرته ونشاطه وخصائصه. في هذه المهمة ستكتشف القواعد بنفسك خطوة بعد خطوة.</p>'+
+    '<div class="goals">'+
+      '<div class="goal">العلاقة بين الحجم الذري وموقع العنصر في الجدول الدوري</div>'+
+      '<div class="goal">العلاقة بين الحجم الذري والنشاط الكيميائي للفلزات واللافلزات</div>'+
+      '<div class="goal">العلاقة بين التوزيع الإلكتروني والخصائص الكيميائية</div>'+
+      '<div class="goal">العلاقة بين إلكترونات المستوى الخارجي وموقع العنصر في المجموعة</div>'+
+    '</div></div>'+
+    '<div class="mystery" aria-hidden="true"><small>؟</small><span class="big sym">X</span><span class="nm">عنصر مجهول</span><span class="mass">5 مراحل لكشف سره</span></div>'+
+    '</div></div>';
+}
+function renderIntro(scr){
+  var st=STAGES[scr.stage];
+  stageEl.innerHTML='<div class="screen"><div class="intro"><div class="bigtile" aria-hidden="true"><small>'+(scr.stage+1)+'</small><span class="num sym">'+(scr.stage+1)+'</span><b>'+st.tile+'</b></div>'+
+    '<div><h2>'+st.title+'</h2><p>'+st.goal+'</p><span class="meta">'+st.count+'</span>'+
+    (st.extra?'<div class="extra">'+st.extra()+'</div>':'')+'</div></div></div>';
+}
+function renderSummary(scr){
+  var st=STAGES[scr.stage];
+  stageEl.innerHTML='<div class="screen summary"><h2>ملخص المرحلة: '+st.title+'</h2><p class="sub">توقف هنا للمناقشة قبل الانتقال إلى المرحلة التالية.</p>'+st.summary()+'</div>';
+}
+function examStats(){
+  var qs=STAGES[4].questions, c=0, wrong=[];
+  qs.forEach(function(q,i){
+    var a=state.ans[q.id];
+    if(a&&a.done&&a.correct) c++; else wrong.push(i);
+  });
+  return {c:c,total:qs.length,wrong:wrong};
+}
+function correctText(q){
+  var t='';
+  q.options.forEach(function(o){ if(o.ok) t = q.type==='element' ? SYM(o.sym) : o.t; });
+  return t;
+}
+function renderResult(){
+  var s=examStats(), qs=STAGES[4].questions, pct=s.c/s.total, circ=2*Math.PI*54;
+  var msg;
+  if(s.c===s.total) msg='ممتاز! أتقنت العلاقة بين الحجم الذري والنشاط الكيميائي والتوزيع الإلكتروني.';
+  else if(s.c>=6) msg='عمل رائع! بقيت نقاط بسيطة تحتاج إلى مراجعة.';
+  else if(s.c>=4) msg='بداية جيدة! راجع ملخصات المراحل ثم أعد الاختبار.';
+  else msg='لا بأس، الاكتشاف يحتاج إلى وقت. عد إلى المراحل وحاول مرة أخرى وستتحسن نتيجتك.';
+  var review='';
+  if(s.wrong.length){
+    review='<h3 style="margin:.2rem 0 .5rem">أسئلة تحتاج إلى مراجعة</h3><ul class="review">';
+    s.wrong.forEach(function(i){
+      var q=qs[i];
+      var p = q.type==='fill' ? q.fill[0]+'…'+q.fill[1] : q.prompt;
+      review+='<li><b>السؤال '+(i+1)+':</b> '+p+'<em>الإجابة الصحيحة: '+correctText(q)+'</em></li>';
+    });
+    review+='</ul>';
+  }
+  stageEl.innerHTML='<div class="screen"><div class="result"><div class="ringbox">'+
+    '<svg viewBox="0 0 140 140" role="img" aria-label="النتيجة '+s.c+' من '+s.total+'"><circle class="track" cx="70" cy="70" r="54"/><circle class="val" id="ringVal" cx="70" cy="70" r="54" stroke-dasharray="0 '+circ.toFixed(1)+'"/>'+
+    '<text x="70" y="78" font-size="34" dir="ltr">'+s.c+' / '+s.total+'</text><text x="70" y="102" font-size="12" style="font-weight:600">النتيجة النهائية</text></svg></div>'+
+    '<div><h2>انتهت المهمة</h2><p class="cheer">'+msg+'</p>'+
+    '<div class="counts"><div class="count g"><b>'+s.c+'</b>إجابات صحيحة</div><div class="count a"><b>'+s.wrong.length+'</b>إجابات تحتاج إلى مراجعة</div></div>'+
+    review+
+    '<div class="actions"><button type="button" class="btn amber" id="btnRetake">إعادة الاختبار</button><button type="button" class="btn" id="btnRestart">العودة إلى بداية الدرس</button></div></div></div></div>';
+  var ring=$('#ringVal');
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){
+    ring.setAttribute('stroke-dasharray',(circ*pct).toFixed(1)+' '+circ.toFixed(1));
+  }); });
+}
+
+/* ================= الشريط العلوي والأزرار ================= */
+function renderChrome(){
+  var scr=SCREENS[state.idx], cur=scr.stage, i, h='';
+  for(i=0;i<STAGES.length;i++){
+    var cls='tile', locked=STAGE_START[i]>state.max;
+    if(i===cur) cls+=' current';
+    else if(cur>-1 && i<cur) cls+=' done';
+    else if(locked) cls+=' locked';
+    h+='<button type="button" class="'+cls+'" data-stage="'+i+'"'+(locked?' disabled aria-disabled="true"':'')+(i===cur?' aria-current="step"':'')+'><small>'+(i+1)+'</small><b>'+STAGES[i].tile+'</b></button>';
+  }
+  $('#stepper').innerHTML=h;
+  var pct=Math.round(state.idx/LAST*100);
+  $('#barFill').style.width=pct+'%';
+  $('#barText').textContent=pct+'%';
+  $('#barWrap').setAttribute('aria-valuenow',pct);
+  $('#btnHome').style.visibility = state.idx===0 ? 'hidden' : 'visible';
+  updateNav();
+}
+function nextLabel(scr){
+  if(scr.kind==='welcome') return 'ابدأ المهمة';
+  if(scr.kind==='intro') return scr.stage===4 ? 'ابدأ الاختبار' : 'ابدأ المرحلة';
+  if(scr.kind==='summary') return scr.stage===3 ? 'الاختبار النهائي' : 'المرحلة التالية';
+  if(scr.kind==='q'){
+    var st=STAGES[scr.stage], last = scr.qi===st.questions.length-1;
+    if(last) return st.exam ? 'عرض النتيجة' : 'ملخص المرحلة';
+    return 'السؤال التالي';
+  }
+  return 'التالي';
+}
+function updateNav(){
+  var scr=SCREENS[state.idx];
+  var prev=$('#btnPrev'), retry=$('#btnRetry'), next=$('#btnNext'), note=$('#navNote');
+  prev.classList.toggle('gone',state.idx===0);
+  retry.classList.toggle('away',scr.kind!=='q');
+  next.classList.toggle('away',scr.kind==='result');
+  $('#nextLabel').textContent=nextLabel(scr);
+  var ok=resolved(scr);
+  next.disabled=!ok;
+  note.textContent = (scr.kind==='q' && !ok) ? 'اختر إجابة للمتابعة' : '';
+}
+
+function render(){
+  var scr=SCREENS[state.idx];
+  if(state.idx>state.max) state.max=state.idx;
+  if(scr.kind==='welcome') renderWelcome();
+  else if(scr.kind==='intro') renderIntro(scr);
+  else if(scr.kind==='q') renderQuestion(scr);
+  else if(scr.kind==='summary') renderSummary(scr);
+  else renderResult();
+  stageEl.scrollTop=0;
+  renderChrome();
+}
+function go(i){
+  if(i<0||i>LAST) return;
+  state.idx=i; render();
+}
+
+/* ================= الاستجابة للإجابات ================= */
+function afterAnswer(scr){
+  var v=scr.q.vis, a=A(scr.q);
+  if(!v||!a.done) return;
+  if(v.kind==='size'){
+    Array.prototype.forEach.call(document.querySelectorAll('#visBox .satom'),function(f){ revealFigure(f,true); });
+  } else if(v.kind==='g1'){
+    var t=$('#g1trio'); if(t) t.classList.add('hot');
+  }
+}
+function refreshPanel(scr){
+  $('#qpanel').innerHTML=qPanelHTML(scr);
+  afterAnswer(scr);
+  updateNav();
+}
+function onPick(scr,oi,pi){
+  var q=scr.q, a=A(q);
+  if(q.type==='multi'){
+    var pa=a.parts[pi], p=q.parts[pi];
+    if(pa.done||pa.wrong.indexOf(oi)>-1) return;
+    if(p.options[oi].ok){ pa.done=true; pa.picked=oi; }
+    else pa.wrong.push(oi);
+    a.done=a.parts.every(function(x){return x.done;});
+    if(a.done) a.correct=true;
+    refreshPanel(scr); return;
+  }
+  if(a.done||a.wrong.indexOf(oi)>-1) return;
+  var ok=!!q.options[oi].ok;
+  if(q.mode==='hint'){
+    if(ok){ a.picked=oi; a.done=true; a.correct=true; }
+    else a.wrong.push(oi);
+  } else {
+    a.picked=oi; a.done=true; a.correct=ok;
+  }
+  refreshPanel(scr);
+}
+
+/* ================= الأحداث ================= */
+document.addEventListener('click',function(ev){
+  var t=ev.target;
+  if(!t.closest) return;
+  var scr=SCREENS[state.idx];
+
+  var opt=t.closest('.opt');
+  if(opt && scr.kind==='q' && !opt.disabled){
+    var oi=parseInt(opt.getAttribute('data-oi'),10);
+    var pi=opt.hasAttribute('data-part')?parseInt(opt.getAttribute('data-part'),10):null;
+    onPick(scr,oi,pi); return;
+  }
+  var el=t.closest('.el');
+  if(el){ state.sel3=el.getAttribute('data-el'); updateP3Detail(); return; }
+
+  var tile=t.closest('.tile');
+  if(tile && !tile.disabled){
+    var si=parseInt(tile.getAttribute('data-stage'),10);
+    if(STAGE_START[si]<=state.max) go(STAGE_START[si]);
+    return;
+  }
+  if(t.closest('#btnNext')){ if(!$('#btnNext').disabled) go(state.idx+1); return; }
+  if(t.closest('#btnPrev')){ go(state.idx-1); return; }
+  if(t.closest('#btnRetry')){
+    if(scr.kind==='q'){ delete state.ans[scr.q.id]; render(); }
+    return;
+  }
+  if(t.closest('#btnHome')){ go(0); return; }
+  if(t.closest('#btnRetake')){
+    STAGES[4].questions.forEach(function(q){ delete state.ans[q.id]; });
+    go(EXAM_FIRST); return;
+  }
+  if(t.closest('#btnRestart')){
+    state.ans={}; state.sel3=null; state.max=0; go(0); return;
+  }
+});
+
+render();
+})();
+</script>
+</body>
+</html>
