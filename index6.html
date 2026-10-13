@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تحدّي أبطال بنية الذرة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1530;--c1:#13224a;--c2:#1b3170;--ac:#38d6ff;--ac2:#7c5cff;--ok:#2ecc8f;--pt:#ffb830;--bd:#ff5d6c;--tx:#eaf1ff;--mu:#9fb2dc}
+*{box-sizing:border-box}
+body{margin:0;font-family:Cairo,Tahoma,"Segoe UI",sans-serif;background:radial-gradient(circle at 20% 0,#1b2f6b,var(--bg) 60%) fixed;color:var(--tx);min-height:100vh;line-height:1.8}
+.wrap{max-width:900px;margin:auto;padding:14px}
+.card{background:linear-gradient(160deg,var(--c1),#101c3f);border:1px solid #2a3e7a;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 6px 24px #0006;animation:in .35s}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+h1{font-size:2rem;margin:.2em 0;background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.top{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid #34509c;background:#12214a;color:var(--tx);border-radius:20px;padding:2px 12px;cursor:pointer;font:inherit;font-size:.85rem}
+.chip.on{background:var(--ac);color:#04142e;font-weight:800}
+.chip.dn{border-color:var(--ok)}
+.bar{height:10px;background:#0a1330;border-radius:6px;overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .5s}
+button.b{font:inherit;font-weight:700;background:linear-gradient(90deg,var(--ac),var(--ac2));color:#04142e;border:0;border-radius:10px;padding:8px 18px;cursor:pointer;margin:4px}
+button.b.g{background:#22356f;color:var(--tx)}
+button.b:disabled{opacity:.4}
+.orig{border-right:4px solid var(--ac);background:#0e1a3d;padding:8px 12px;border-radius:8px;margin:8px 0}
+.lbl{font-size:.75rem;color:var(--ac);font-weight:800;display:block}
+.hint{border-right:4px solid var(--pt);background:#2a2410;padding:6px 12px;border-radius:8px;margin:8px 0;font-size:.9rem;color:#ffe3a3}
+.sol{border-right:4px solid var(--ok);background:#0d2a28;padding:8px 12px;border-radius:8px;margin:8px 0}
+textarea,input.t{width:100%;font:inherit;background:#0a1330;color:var(--tx);border:1px solid #34509c;border-radius:8px;padding:8px}
+textarea{min-height:70px}
+.s{display:inline-block;border-radius:12px;padding:0 10px;font-size:.8rem;font-weight:800;color:#04142e}
+.s.ok{background:var(--ok)}.s.part{background:var(--pt)}.s.bad{background:var(--bd)}
+table.tb{width:100%;border-collapse:collapse}
+.tb th{background:#d98320;color:#fff;padding:6px}
+.tb td{border:1px solid #34509c;padding:4px;text-align:center}
+.tb td.k{font-weight:800;background:#12214a}
+.tb input{text-align:center;padding:4px}
+.pt{overflow-x:auto;direction:ltr;padding:6px 0}
+.grid{display:grid;grid-template-columns:repeat(18,38px);gap:2px;width:max-content;margin:auto}
+.cl{height:38px;border:1px solid #4a6bc4;background:#17306b;border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:800;position:relative;cursor:pointer;font-family:Georgia,serif}
+.cl:hover{background:#26479a}
+.cl.pk{outline:2px solid var(--ac);background:#1b5a86}
+.cl i{position:absolute;top:-2px;right:1px;font:normal 700 .6rem Cairo;color:var(--pt)}
+.mc{padding:6px 10px;margin:4px 0;border:1px solid #34509c;border-radius:10px;cursor:pointer;display:block}
+.mc.sel{border-color:var(--ac);background:#14316b}.mc.ok{background:#0d3a2e;border-color:var(--ok)}.mc.no{background:#3d1520;border-color:var(--bd)}
+.sub{padding:6px 10px;border-radius:10px;border:1px solid #2a3e7a;margin:5px 0;cursor:pointer}.sub.on{border-color:var(--ac);background:#10224d}
+.nav{display:flex;justify-content:space-between;margin-top:8px}
+.orbit{position:relative;width:150px;height:150px;margin:auto}
+.orbit b{position:absolute;inset:50%;width:22px;height:22px;margin:-11px;border-radius:50%;background:radial-gradient(#fff,var(--ac));box-shadow:0 0 20px var(--ac)}
+.orbit span{position:absolute;inset:0;border:1px solid #4a6bc4;border-radius:50%;animation:sp 6s linear infinite}
+.orbit span:nth-child(2){inset:18px;animation-duration:4s;animation-direction:reverse}
+.orbit span:nth-child(3){inset:36px;animation-duration:3s}
+.orbit span:after{content:"";position:absolute;top:-5px;left:50%;width:10px;height:10px;border-radius:50%;background:var(--ac2);box-shadow:0 0 10px var(--ac2)}
+@keyframes sp{to{transform:rotate(360deg)}}
+.set{position:fixed;left:10px;bottom:10px;z-index:5}
+.pnl{background:#101c3f;border:1px solid var(--ac);border-radius:12px;padding:10px;margin-bottom:6px;font-size:.85rem;max-width:230px}
+.pnl input[type=number]{width:55px}
+.num{direction:ltr;unicode-bidi:isolate;display:inline-block}
+.big{font-size:2.4rem;font-weight:800;color:var(--ac)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="set"><div id="pnl"></div><button class="chip" onclick="S.sp=!S.sp;sp()">⚙ الإعدادات</button></div>
+<script>
+const $=id=>document.getElementById(id);
+const N={1:1,2:1,3:9,4:3,5:7,6:8};
+const S={name:'',stage:0,seq:[],t:{},cells:{},cur5:'a',m:{},R:{1:[],2:[],3:[],4:[],5:[],6:[]},w:{1:3,2:2,3:9,4:6,5:7,6:8},sol:true,rev:false,sp:false};
+const pool=['rut','dal','tho'],MN={dal:'نموذج دالتون',tho:'نموذج ثومسون',rut:'نموذج رذرفورد'};
+const LET=['أ','ب','جـ','د'];
+function n(s){return(s||'').toString().replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[−–—]/g,'-').trim()}
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function kw(txt,gs,need){const t=n(txt),c=gs.filter(g=>g.test(t)).length;return c>=need?'ok':c>0?'part':'bad'}
+const B=(s)=>`<span class="s ${s}">${{ok:'صحيحة',part:'غير مكتملة',bad:'خاطئة'}[s]}</span>`;
+
+/* ---- بيانات الكتاب ---- */
+const Q1='أُوضِّحُ بالرسمِ تطوُّرَ النماذجِ الذرّيةِ، بدءًا منْ نموذجِ دالتون، ثمَّ نموذجِ ثومسون، وصولًا إلى نموذجِ رذرفورد.';
+const Q2='أُوضِّحُ المقصودَ بكلٍّ ممّا يأتي: الدوريّةُ.';
+const Q3='أملأُ الفراغاتِ في الجدولِ الآتي، بما يناسبُها منْ معلوماتٍ تتعلّقُ بمكوِّناتِ الذرَّةِ:';
+const Q4=[['أ','مرورُ عددٍ كبيرٍ منْ جسيماتِ ألفا خلالَ صفيحةِ الذهبِ، وارتدادُ جزءٍ قليلٍ جدًّا منْ هذهِ الجسيماتِ عندَ اصطدامِها بالصفيحةِ.'],['ب','فشلُ نموذجِ ثومسون للذرَّةِ.'],['جـ','تشابُهُ الخصائصِ الكيميائيّةِ لعناصرِ المجموعةِ الواحدةِ في الجدولِ الدوريِّ.']];
+const Q5I='يُمثِّلُ الجدولُ الآتي مقطعًا في الجدولِ الدوريِّ وبعضَ العناصرِ الافتراضيّةِ:';
+const Q5S='أدرسُ الجدولَ السابقَ، ثمَّ أُجيبُ عنِ الأسئلةِ الآتيةِ:';
+const L5={'1-1':'A','1-18':'L','2-1':'G','2-13':'D','2-14':'E','2-17':'X','3-2':'Q','3-14':'W','3-18':'M','4-1':'Z','4-13':'J','4-16':'R','4-17':'T'};
+const P5=[
+['أ','أختارُ عنصرًا منَ الدورةِ الثانيةِ والمجموعةِ الرابعةِ.',['2-14'],[],'E — الصف الثاني (الدورة 2)، والعمود الرابع عشر هو المجموعة 4A.'],
+['ب','أختارُ عنصرًا يُمثِّلُ غازًا نبيلًا.',['1-18','3-18'],[],'L أو M — العمود الأخير (المجموعة 8A) يضم الغازات النبيلة.'],
+['جـ','أُحدِّدُ عنصرًا منَ الدورةِ الرابعةِ يحتوي مُستواهُ الخارجيُّ على 6e.',['4-16'],[],'R — الدورة 4، المجموعة 6A: ستة إلكترونات في المستوى الخارجي.'],
+['د','أُحدِّدُ عنصرًا منْ مجموعةِ الفلزّاتِ القلويّةِ الأرضيّةِ.',['3-2'],[],'Q — المجموعة 2A هي الفلزات القلوية الأرضية.'],
+['هـ','أُحدِّدُ عنصرًا لهُ أصغرُ حجمٍ ذرّيٍّ في الدورةِ الثانيةِ.',['2-18'],['2-17'],'الخلية في أقصى يمين الدورة الثانية (الغاز النبيل في المجموعة 8A)؛ فالحجم الذري يتناقص من اليسار إلى اليمين. أقرب رمز مُسمّى هو X.'],
+['و','أستنتجُ العنصرَ الأكثرَ نشاطًا في المجموعةِ 1A.',['4-1'],[],'Z — النشاط الكيميائي لعناصر المجموعة 1A يزداد من الأعلى إلى الأسفل (مع زيادة الحجم الذري).'],
+['ز','أستنتجُ العنصرَ الأكثرَ نشاطًا في المجموعةِ 7A.',['2-17'],[],'X — في المجموعة 7A يقل النشاط بالاتجاه إلى الأسفل، فأعلاها أنشط.']];
+const Q6=[
+['اكتُشفتِ النواةُ في الذرَّةِ عنْ طريقِ تجارِبِ:',['دالتون.','رذرفورد.','ثومسون.','شادويك.'],1,'رذرفورد اكتشف النواة من تجربة صفيحة الذهب وجسيمات ألفا.'],
+['الجُسيمُ الذي يحملُ الشِّحنةَ الكهربائيّةَ السالبةَ في الذرَّةِ يُسمّى:',['البروتون','النيوترون','النواةَ.','الإلكترون.'],3,'الإلكترون سالب الشحنة، والبروتون موجب، والنيوترون متعادل.'],
+['العالِمُ الذي صمَّمَ أوّلَ نموذجٍ ذرِّيٍّ مبنيٍّ على المشاهداتِ التجريبيّةِ العلميّةِ هوَ:',['رذرفورد.','دالتون.','بور.','ثومسون.'],1,'دالتون صمّم أول نموذج ذري مبني على مشاهدات تجريبية.'],
+['التوزيعُ الإلكترونيُّ الذي يُمثِّلُ ذرَّةَ غازٍ نبيلٍ هوَ:',['2,6','2,8','2,8,2','2,8,8,2'],1,'2,8 مستوى خارجي مكتمل (النيون)، وهو من الغازات النبيلة.'],
+['التوزيعُ الإلكترونيُّ الذي يُمثِّلُ عنصرًا يَنتمي إلى مجموعةِ العناصرِ القلويّةِ الأرضيّةِ هوَ:',['2,8','2,8,1','2,8,3','2,8,1'],-1,'تنبيه: الخياران (ب) و(د) مطبوعان في الكتاب بالتوزيع نفسه 2,8,1، ولا يوجد بين الخيارات 2,8,2 الذي يمثل العناصر القلوية الأرضية (إلكترونان في المستوى الخارجي). نُقل السؤال كما ورد، ويُحتسب هذا السؤال صحيحًا لأي اختيار. يُنصح بمراجعة المعلم.'],
+['التوزيعُ الإلكترونيُّ الذي يُمثِّلُ عنصرًا يقعُ في الدورةِ الثالثةِ والمجموعةِ 5A هوَ:',['2,8,3','2,8,8','2,8,5','2,5'],2,'الدورة الثالثة: ثلاثة مستويات، والمجموعة 5A: خمسة إلكترونات خارجية، فالتوزيع 2,8,5.'],
+['العنصرُ الذي يُستخدمُ في تعبئةِ (بالوناتِ الرصدِ الجويِّ) هوَ:',['الفلور.','الهيدروجين.','الأكسجين.','الهيليوم.'],3,'يُستخدم الهيليوم (غاز نبيل) في تعبئة بالونات الرصد الجوي.'],
+['العنصرُ الذي يُستخدمُ في صناعةِ التيفلونِ هوَ:',['الفلور.','الكلور.','النيتروجين.','النيون.'],0,'يدخل الفلور في صناعة التيفلون.']];
+
+/* ---- التصحيح ---- */
+function grade(q){
+ let r=[];
+ if(q==1){const c=S.seq.filter((x,i)=>x==['dal','tho','rut'][i]).length;r=[S.seq.length<3?'bad':c==3?'ok':c?'part':'bad']}
+ if(q==2){const t=n(S.t.q2),a=/تكرر|متكرر|دوري|تعاقب|تكرار/.test(t),b=/خصائص|خواص|صفات/.test(t);r=[a&&b?'ok':(a||b)?'part':'bad']}
+ if(q==3){const R=[[/\+|موجب/,/^(1|واحد)/,/نواه/],[/^(0|صفر)$|متعادل|معدوم|لا يوجد|لا شحن|عديم/,/^(1|واحد)/,/نواه/],[/-|سالب/,/1\s*\/\s*1840|1840|مهمل|اهمل|ضئيل|صغير/,/حول|خارج|مستويات|مدار|سحاب/]];
+  R.forEach((row,i)=>row.forEach((re,j)=>r.push(re.test(n(S.t['c'+i+j]))?'ok':'bad')))}
+ if(q==4){r=[kw(S.t.q4a,[/فراغ|فارغ|خالي/,/نواه|مركز/,/موجب|تنافر|ارتد|كثاف|كتل|صغير/],3),kw(S.t.q4b,[/كره|زبيب|كعك|موزع|منتشر|مغمور|الكترونات/,/نواه|رذرفورد|الفا|ارتد|تجرب|موجب/],2),kw(S.t.q4c,[/الخارجي|التكافو|الاخير/,/نفس|متساو|متشابه|ذاته|عدد|واحد/],2)]}
+ if(q==5){r=P5.map(p=>{const c=S.cells[p[0]];return p[2].includes(c)?'ok':p[3].includes(c)?'part':'bad'})}
+ if(q<6){S.R[q]=r;}
+}
+function chk(q){grade(q);render()}
+function sc(q){return(S.w[q]/N[q])*Array.from({length:N[q]},(_,i)=>({ok:1,part:.5}[S.R[q][i]]||0)).reduce((a,b)=>a+b,0)}
+function done(){return Object.keys(N).reduce((a,q)=>a+Array.from({length:N[q]},(_,i)=>S.R[q][i]).filter(Boolean).length,0)}
+
+/* ---- مكوّنات العرض ---- */
+const head=(num,txt)=>`<div class="orig"><span class="lbl">نص الكتاب — السؤال ${num}</span>${txt}</div>`;
+const solBox=(q,h)=>(S.sol||S.rev)&&S.R[q].some(Boolean)?`<div class="sol"><span class="lbl">الحل النموذجي</span>${h}</div>`:(S.R[q].some(Boolean)?'<div class="hint">الحلول النموذجية مخفية من الإعدادات.</div>':'');
+const ta=(k,ph)=>`<textarea placeholder="${ph}" oninput="S.t['${k}']=this.value">${esc(S.t[k])}</textarea>`;
+const ckb=q=>`<button class="b" onclick="chk(${q})">تحقق من الإجابة</button>`;
+function svgM(){const e=(x,y)=>`<circle cx="${x}" cy="${y}" r="4" fill="#38d6ff"/>`;
+return `<svg viewBox="0 0 420 150" style="width:100%;max-width:520px;direction:ltr"><g fill="none" stroke="#7c5cff">
+<circle cx="60" cy="65" r="40" fill="#7c5cff55"/><circle cx="210" cy="65" r="45" fill="#ff5d6c33" stroke="#ff5d6c"/>
+<circle cx="360" cy="65" r="45" stroke-dasharray="3"/><circle cx="360" cy="65" r="28" stroke-dasharray="3"/></g>
+<circle cx="360" cy="65" r="7" fill="#ff5d6c"/>${e(405,65)}${e(332,65)}
+<g fill="#38d6ff"><circle cx="190" cy="50" r="4"/><circle cx="225" cy="60" r="4"/><circle cx="205" cy="85" r="4"/><circle cx="235" cy="82" r="4"/></g>
+<g fill="#fff" font-size="14" text-anchor="middle" font-family="Cairo"><text x="210" y="68" fill="#ff5d6c">+ +</text><text x="60" y="135">دالتون: كرة مصمتة</text><text x="210" y="135">ثومسون: كرة موجبة وإلكترونات</text><text x="360" y="135">رذرفورد: نواة وإلكترونات</text></g></svg>`}
+
+/* ---- المراحل ---- */
+function s1(){const av=pool.filter(x=>!S.seq.includes(x));
+ return head(1,Q1)+`<div class="hint"><span class="lbl">تلميح اللعبة</span>رتّب النماذج بحسب تطورها التاريخي: اضغط على البطاقات بالترتيب (الأول ثم الثاني ثم الثالث).</div>
+ <div>${av.map(x=>`<button class="b g" onclick="S.seq.push('${x}');render()">${MN[x]}</button>`).join('')}</div>
+ <div class="card" style="display:flex;gap:8px;flex-wrap:wrap">${[0,1,2].map(i=>`<div style="flex:1;min-width:120px;text-align:center"><span class="lbl">المرحلة ${i+1}</span>${S.seq[i]?MN[S.seq[i]]:'—'}${S.R[1][0]&&S.seq[i]?' '+(S.seq[i]==['dal','tho','rut'][i]?'✔':'✘'):''}</div>`).join('')}</div>
+ <button class="b g" onclick="S.seq.pop();render()">تراجع</button><button class="b g" onclick="S.seq=[];render()">مسح</button>${ckb(1)} ${S.R[1][0]?B(S.R[1][0]):''}
+ ${solBox(1,'الترتيب: دالتون ← ثومسون ← رذرفورد.<br>'+svgM())}`}
+function s2(){return head(2,Q2)+ta('q2','اكتب المقصود بالدورية بأسلوبك...')+ckb(2)+(S.R[2][0]?B(S.R[2][0]):'')+solBox(2,'الدورية: تغيّرات متكررة تحدث في خصائص العناصر في كل دورة ومجموعة من الجدول الدوري، ويُستفاد منها في التنبؤ بسلوك العناصر وخصائصها.')}
+function s3(){const nm=['البروتونات','النيوترونات','الإلكترونات'];
+ return head(3,Q3)+`<table class="tb"><tr><th>مكوِّنات الذرَّة</th><th>الشِّحنةُ</th><th>الكتلةُ النسبيّةُ</th><th>موقعُها في الذرَّةِ</th></tr>${nm.map((x,i)=>`<tr><td class="k">${x}</td>${[0,1,2].map(j=>`<td><input class="t" value="${esc(S.t['c'+i+j])}" oninput="S.t['c${i}${j}']=this.value" ${S.R[3][i*3+j]?`style="border-color:var(--${{ok:'ok',bad:'bd'}[S.R[3][i*3+j]]})"`:''}></td>`).join('')}</tr>`).join('')}</table>
+ ${ckb(3)} ${S.R[3][0]?`<span class="s ok">${S.R[3].filter(x=>x=='ok').length} من 9 صحيحة</span>`:''}
+ ${solBox(3,'<table class="tb"><tr><td class="k">البروتونات</td><td>+1</td><td>1</td><td>داخل النواة</td></tr><tr><td class="k">النيوترونات</td><td>0 (متعادل)</td><td>1</td><td>داخل النواة</td></tr><tr><td class="k">الإلكترونات</td><td>−1</td><td><span class="num">1/1840</span> (مهملة)</td><td>حول النواة في مستويات الطاقة</td></tr></table>')}`}
+function s4(){const sl=['فُسِّرت مرور معظم الجسيمات لأن الذرة معظمها فراغ، وارتداد القليل منها لأن في مركزها نواة صغيرة كثيفة موجبة الشحنة تتنافر مع جسيمات ألفا الموجبة.','افترض ثومسون أن الذرة كرة موجبة الشحنة تتوزع فيها الإلكترونات، فلم يفسّر ارتداد جسيمات ألفا في تجربة رذرفورد، ولا وجود النواة.','لأن لها عدد الإلكترونات نفسه في المستوى الخارجي (إلكترونات التكافؤ)، والخصائص الكيميائية تعتمد على هذا العدد.'];
+ return head(4,'أُفسِّرُ:')+Q4.map((q,i)=>`<div class="orig"><span class="lbl">${q[0]}</span>${q[1]}</div>${ta('q4'+'abc'[i],'اكتب تفسيرك...')}${S.R[4][i]?B(S.R[4][i]):''}`).join('')+ckb(4)+solBox(4,sl.map((x,i)=>`<b>${Q4[i][0]}.</b> ${x}`).join('<br>'))}
+function s5(){let rows='';for(let r=1;r<=4;r++)for(let c=1;c<=18;c++){const k=r+'-'+c,ex=r==4||c==1||c==2&&r>1||c>=13&&r>1||(r==1&&c==18);
+  if(!ex){rows+='<div></div>';continue}
+  const ch=P5.filter(p=>S.cells[p[0]]==k).map(p=>p[0]).join(' ');
+  rows+=`<div class="cl ${ch?'pk':''}" onclick="S.cells[S.cur5]='${k}';render()">${L5[k]||''}${ch?`<i>${ch}</i>`:''}</div>`}
+ return head(5,Q5I)+`<div class="pt"><div class="grid">${rows}</div></div><div class="orig"><span class="lbl">${'نص الكتاب'}</span>${Q5S}</div>
+ <div class="hint"><span class="lbl">تلميح اللعبة</span>اختر الفرع من القائمة ثم اضغط الخلية المناسبة في الجدول (بعض الخلايا غير مُسمّاة).</div>
+ ${P5.map((p,i)=>`<div class="sub ${S.cur5==p[0]?'on':''}" onclick="S.cur5='${p[0]}';render()"><b>${p[0]}.</b> ${p[1]} ${S.cells[p[0]]?`<span class="num">[${L5[S.cells[p[0]]]||'خلية غير مسمّاة'}]</span>`:''} ${S.R[5][i]?B(S.R[5][i]):''}</div>`).join('')}
+ ${ckb(5)}${solBox(5,P5.map(p=>`<b>${p[0]}.</b> ${p[4]}`).join('<br>'))}`}
+function s6(){return head(6,'أختارُ الإجابةَ الصحيحةَ في كلِّ جملةٍ منَ الجملِ الآتيةِ:')+Q6.map((q,i)=>{const d=S.R[6][i],cs=S.m[i];
+ return `<div class="card"><span class="lbl">السؤال 6 — الفقرة ${i+1}</span><div>${i+1}– ${q[0]}</div>${q[1].map((o,j)=>`<label class="mc ${d?(j==q[2]?'ok':j==cs?'no':''):cs===j?'sel':''}"><input type="radio" name="m${i}" ${cs===j?'checked':''} ${d?'disabled':''} onchange="S.m[${i}]=${j};render()"> ${LET[j]}) <bdi>${o}</bdi></label>`).join('')}
+ ${d?`${B(d)} <div class="sol">${S.sol||S.rev?q[3]:'تم اعتماد الإجابة.'}</div>`:`<button class="b" ${cs===undefined?'disabled':''} onclick="S.R[6][${i}]=${q[2]<0?"'ok'":`S.m[${i}]==${q[2]}?'ok':'bad'`};render()">اعتمد الإجابة</button>`}</div>`}).join('')}
+function s7(){const t=Object.keys(N).reduce((a,q)=>a+S.w[q],0),g=Object.keys(N).reduce((a,q)=>a+sc(q),0);
+ let c={ok:0,part:0,bad:0};for(const q in N)for(let i=0;i<N[q];i++)c[S.R[q][i]||'bad']++;
+ const need=Object.keys(N).filter(q=>Array.from({length:N[q]},(_,i)=>S.R[q][i]).some(x=>x!='ok'));
+ return `<div class="card" style="text-align:center"><h1>النتيجة النهائية${S.name?' — '+esc(S.name):''}</h1><div class="big">${g.toFixed(1)} / ${t}</div><div>نسبة الإنجاز: ${Math.round(g/t*100)}%</div><div class="bar"><i style="width:${g/t*100}%"></i></div>
+ <span class="s ok">صحيحة ${c.ok}</span> <span class="s part">غير مكتملة ${c.part}</span> <span class="s bad">خاطئة / غير مجاب ${c.bad}</span>
+ <p>${need.length?'أسئلة تحتاج إلى مراجعة: '+need.map(q=>`<button class="chip" onclick="S.rev=true;go(${q})">السؤال ${q}</button>`).join(' '):'ممتاز! أجبت عن جميع الأسئلة إجابة صحيحة.'}</p>
+ <button class="b" onclick="S.rev=true;go(1)">مراجعة إجاباتي</button><button class="b g" onclick="reset()">إعادة التحدي</button>
+ <p style="font-size:.8rem;color:var(--mu)">تقييم تدريبي وليس توزيع العلامات الرسمي، ويمكن تعديل العلامات من الإعدادات.</p></div>`}
+
+const F=[null,s1,s2,s3,s4,s5,s6,s7];
+function go(i){S.stage=i;render();scrollTo(0,0)}
+function reset(){location.reload()}
+function render(){
+ if(S.stage==0){$('app').innerHTML=`<div class="card" style="text-align:center"><div class="orbit"><span></span><span></span><span></span><b></b></div><h1>تحدّي أبطال بنية الذرة</h1><div style="color:var(--ac)">مراجعة الوحدة الأولى – كيمياء الصف التاسع</div>
+ <p>الوحدة الأولى: بنية الذرة — أسئلة مراجعة الوحدة كاملةً من كتاب الكيمياء (الفصل الأول)، الصفحتان <span class="num">31</span> و<span class="num">32</span>: ستة أسئلة بجميع فروعها.</p>
+ <input class="t" style="max-width:300px" placeholder="اسم الطالب (اختياري)" value="${esc(S.name)}" oninput="S.name=this.value"><br><button class="b" onclick="go(1)">ابدأ التحدي</button></div>`;return}
+ const d=done(),T=29;
+ const top=S.stage<7?`<div class="card"><div class="top"><b>السؤال ${S.stage} من 6${S.stage==5?' — الفرع ('+S.cur5+')':''}</b><span style="font-size:.85rem;color:var(--mu)">أُنجز ${d} من ${T} فرعًا${S.rev?' — وضع المراجعة':''}</span></div><div class="bar"><i style="width:${d/T*100}%"></i></div><div class="chips">${[1,2,3,4,5,6].map(i=>`<button class="chip ${S.stage==i?'on':''} ${S.R[i].some(Boolean)?'dn':''}" onclick="go(${i})">${i}</button>`).join('')}</div></div>`:'';
+ const nav=S.stage<7?`<div class="nav"><button class="b g" ${S.stage==1?'disabled':''} onclick="go(${S.stage-1})">السابق</button><button class="b" onclick="go(${S.stage+1})">${S.stage==6?'إنهاء وعرض النتيجة':'متابعة'}</button></div>`:'';
+ $('app').innerHTML=top+(S.stage<7?`<div class="card">${F[S.stage]()}</div>`:F[7]())+nav}
+function sp(){$('pnl').innerHTML=S.sp?`<div class="pnl"><b>العلامات لكل سؤال</b><br>${Object.keys(N).map(q=>`س${q}: <input type="number" min="0" value="${S.w[q]}" onchange="S.w[${q}]=Math.max(0,+this.value||0)"><br>`).join('')}<label><input type="checkbox" ${S.sol?'checked':''} onchange="S.sol=this.checked;render()"> إظهار الحلول النموذجية بعد المحاولة</label></div>`:''}
+render();
+</script>
+</body>
+</html>
