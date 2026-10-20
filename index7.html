@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مهمة المختبر: اكشف هوية المادة</title>
+<style>
+:root{--bg:#eef2f1;--sf:#fff;--ink:#14282b;--mut:#587073;--ln:#c4d3d1;--acid:#d6402f;--base:#2f66c4;--ok:#17805a;--bad:#b9420e;--acc:#0f5c5c;--on:#e3f1ef;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1a1c;--sf:#162729;--ink:#e6f0ef;--mut:#9fb4b6;--ln:#2d4447;--acc:#5cc2b8;--acid:#ff6b57;--base:#6aa4f5;--ok:#4fcf97;--bad:#ff9b63;--on:#1d3a3c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1a1c;--sf:#162729;--ink:#e6f0ef;--mut:#9fb4b6;--ln:#2d4447;--acc:#5cc2b8;--acid:#ff6b57;--base:#6aa4f5;--ok:#4fcf97;--bad:#ff9b63;--on:#1d3a3c;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:20px/1.7 "Segoe UI",Tahoma,"Noto Naskh Arabic","Geeza Pro",sans-serif}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--sf);border-bottom:2px solid var(--ln);padding:10px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+header h1{font-size:1.1rem;margin:0;flex:1 1 220px}
+.strip{display:flex;gap:4px;flex:2 1 280px}
+.strip i{flex:1;height:14px;border-radius:3px;background:var(--ln);transition:background .5s}
+.strip i.d{background:linear-gradient(90deg,var(--acid),var(--base))}
+.strip i.c{background:var(--acc)}
+.pts{font-weight:700;color:var(--acc);white-space:nowrap}
+.ib{font:inherit;font-size:.8rem;padding:6px 12px;border:1.5px solid var(--ln);background:var(--sf);color:var(--ink);border-radius:8px;cursor:pointer}
+main{max-width:1000px;margin:0 auto;padding:20px}
+h2{margin:.2em 0;font-size:1.5rem}
+.lead{color:var(--mut);margin:.2em 0 1em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:18px}
+.card,.box{background:var(--sf);border:2px solid var(--ln);border-radius:14px;padding:14px}
+.card{text-align:center}
+.card b{display:block;font-size:.95rem}
+.opts{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+button{font:inherit;cursor:pointer}
+.o,.chip{padding:8px 12px;border-radius:10px;border:2px solid var(--ln);background:var(--sf);color:var(--ink);font-size:.9rem;transition:background .2s,border-color .2s}
+.o:hover:not(:disabled),.chip:hover{border-color:var(--acc)}
+.o.on,.chip.on{background:var(--on);border-color:var(--acc);font-weight:700}
+.o.ok{border-color:var(--ok);background:var(--on)}.o.no{border-color:var(--bad)}
+.main{display:block;margin:16px auto 0;padding:14px 36px;font-size:1.1rem;font-weight:700;border:0;border-radius:12px;background:var(--acc);color:var(--bg);min-width:240px}
+.main:disabled{opacity:.45;cursor:not-allowed}
+.note{border-inline-start:6px solid var(--acc);background:var(--on);padding:10px 14px;border-radius:8px;margin:12px 0;font-size:.92rem}
+.warn{border-color:var(--bad)}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.lab{display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:center}
+.sw{width:150px;height:26px;border:2px solid var(--ln);border-radius:4px;transition:background .8s;margin:6px auto}
+.log span{display:inline-block;margin:3px;padding:3px 10px;border-radius:20px;border:1.5px solid var(--ln);font-size:.82rem}
+.ans{margin-top:12px}.ans.g{color:var(--ok)}.ans.b{color:var(--bad)}
+.pop{animation:in .5s ease both}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+details{margin-top:22px;background:var(--sf);border:2px dashed var(--acc);border-radius:12px;padding:10px 16px;font-size:.9rem}
+summary{cursor:pointer;font-weight:700;color:var(--acc)}
+details li{margin:4px 0}
+footer{text-align:center;color:var(--mut);font-size:.8rem;padding:16px 20px 28px}
+svg{max-width:100%}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head>
+<body>
+<header>
+<h1>مهمة المختبر: اكشف هوية المادة</h1>
+<div class="strip" id="bar" aria-label="تقدم المهمة"></div>
+<span class="pts" id="pts">النقاط: 0</span>
+<button class="ib" id="snd" onclick="S.mute=!S.mute;this.textContent=S.mute?'الصوت: مكتوم':'الصوت: يعمل'">الصوت: يعمل</button>
+<button class="ib" onclick="S.teach=!S.teach;render()">وضع المعلم</button>
+</header>
+<main id="app"></main>
+<footer>التجارب الحقيقية من مسؤولية المعلم مع نظارات الوقاية وإرشادات المختبر. لا تذوّقوا المواد ولا تلمسوها، ولا تخلطوا مواد التنظيف المنزلية.</footer>
+<script>
+const $=s=>document.querySelector(s);
+const NAMES=['لغز المواد','التوقع','مختبر الكواشف','المحقق','السؤال'];
+const SM=[{n:'عصير الليمون',c:'#f0e38f',t:'a'},{n:'الخل',c:'#eaf0ee',t:'a'},{n:'محلول صودا الخبز',c:'#eef3f4',t:'b'},{n:'محلول الصابون',c:'#e6eff3',t:'b'},{n:'الماء',c:'#edf3f4',t:'n'}];
+const KIND=['حمضية','قاعدية','متعادلة'];
+const RED='#d6402f',BLUE='#3b6fd4';
+const S={st:0,score:0,mute:false,teach:true,g:{},rv:false,p:0,pk:null,pr:false,sm:null,ind:null,log:[],out:null,c:0,ck:null};
+let AC;
+function snd(ok){if(S.mute)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();(ok?[523,784]:[196,165]).forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+i*.13;o.frequency.value=f;g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+.26)})}catch(e){}}
+function bk(c,w){return `<svg viewBox="0 0 80 100" width="${w||80}" aria-hidden="true"><path d="M14 8h52l-4 76a8 8 0 0 1-8 8H26a8 8 0 0 1-8-8z" fill="none" stroke="var(--mut)" stroke-width="3"/><path style="transition:fill .8s" d="M18 40h44l-2 44a6 6 0 0 1-6 6H26a6 6 0 0 1-6-6z" fill="${c}" stroke="var(--mut)" stroke-width="1"/></svg>`}
+const TIPS=[
+['«هل نستطيع معرفة طبيعة سائل من شكله فقط؟»','3 إلى 4 دقائق','المظهر انطباع وليس دليلًا؛ المواد المتشابهة شكلًا قد تختلف في خصائصها.','لا تجربة هنا؛ اجعل الطلاب يتوقعون ويبرّرون شفهيًا.','اطلب تبريرًا لكل توقع، ثم قل: «توقعاتنا فرضيات تحتاج إلى أدلة».'],
+['«ماذا سيحدث للكاشف عند ملامسته للعينة؟ ولماذا تتوقع ذلك؟»','5 دقائق (دقيقة ونصف لكل موقف)','الكواشف تغيّر لونها بحسب طبيعة المحلول، والتوقع يُختبر بالتجربة.','بعد أن يختار الطلاب توقعهم ينفّذ المعلم الاختبار فعليًا (قطرة من العينة على الورقة)، ثم يضغط «اعرض النتيجة المتوقعة» للمقارنة.','اطلب من كل طالب تسجيل ما رآه فعلًا، ثم قارنوه بما عرضه الجهاز: ما أوجه الاتفاق؟ وإن اختلفت النتيجة فما الأسباب المحتملة؟'],
+['«كيف نصل إلى قرار بأقل عدد من الاختبارات؟»','6 دقائق','كل كاشف يعطي دليلًا جزئيًا، ودمج الأدلة يؤدي إلى استنتاج أدق.','المحاكاة تسبق التطبيق ولا تغني عنه؛ نفّذ اختبارًا أو اثنين فعليًا قبل تثبيت أي استنتاج.','اسأل: هل يكفي ورق تباع الشمس الأزرق وحده؟ ماذا نضيف؟ اربط الإجابة بفكرة التمييز بين الحمضي والقاعدي والمتعادل.'],
+['«ما أفضل استنتاج تسنده الأدلة، ولماذا؟»','5 دقائق','التمييز بين المشاهدة والاستنتاج؛ لا حكم بلا دليل.','لا تجربة؛ حالات استدلال للنقاش.','اطلب من الطلاب فصل «ماذا رأينا؟» عن «ماذا استنتجنا؟» في كل حالة.'],
+['«كيف نميّز بين الحمضي والقاعدي علميًا؟ وهل تتفاعل مواد مختلفة لتنتج مادة جديدة؟»','3 دقائق (نقاش مفتوح بلا إجابة نهائية)','سؤال يقود إلى الدرس: خصائص الحموض والقواعد وتفاعل التعادل وتكوّن الأملاح.','يُنفَّذ لاحقًا ضمن الدرس لا هنا.','دوّن أسئلة الطلاب على السبورة وارجع إليها في نهاية الوحدة.']];
+function tip(){const t=TIPS[S.st];return `<details ${S.teach?'open':''}><summary>تلميح المعلم</summary><ul><li><b>السؤال الشفهي:</b> ${t[0]}</li><li><b>الوقت المقترح:</b> ${t[1]}</li><li><b>الفكرة العلمية:</b> ${t[2]}</li><li><b>التجربة الحقيقية:</b> ${t[3]}</li><li><b>الربط بالمفهوم:</b> ${t[4]}</li></ul></details>`}
+function bar(){$('#bar').innerHTML=NAMES.map((n,i)=>`<i class="${i<S.st?'d':i==S.st?'c':''}" title="${n}"></i>`).join('');$('#pts').textContent='النقاط: '+S.score}
+function go(n){S.st=n;scrollTo(0,0);render()}
+function render(){$('#app').innerHTML='<div class="pop">'+[st1,st2,st3,st4,st5][S.st]()+tip()+'</div>';bar()}
+/* المرحلة 1 */
+function g1(i,k){S.g[i]=k;snd(true);render()}
+function st1(){const done=Object.keys(S.g).length==5;
+return `<h2>المرحلة الأولى: لغز المواد الغامضة</h2><p class="lead">خمسة سوائل أمامك. هل يمكن معرفة طبيعتها من شكلها فقط؟ اختر توقعك لكل عينة.</p>
+<div class="grid">${SM.map((m,i)=>`<div class="card">${bk(m.c)}<b>${m.n}</b><div class="opts">${KIND.map((o,k)=>`<button class="o${S.g[i]===k?' on':''}" onclick="g1(${i},${k})">${o}</button>`).join('')}</div></div>`).join('')}</div>
+${S.rv?`<div class="box"><b>ما الذي نلاحظه؟</b><p>كثير من هذه السوائل يبدو عديم اللون أو شبه عديمه، ومع ذلك تختلف في خصائصها. الشكل يعطينا انطباعًا فقط، أما الحكم العلمي فيحتاج إلى دليل. توقعاتكم الآن فرضيات؛ سنختبرها بالتجربة والكواشف.</p></div><button class="main" onclick="go(1)">إلى تحدي التوقع</button>`:`<button class="main" ${done?'':'disabled'} onclick="S.rv=true;snd(true);render()">${done?'اكشف الفكرة':'اختر توقعًا لكل عينة'}</button>`}`}
+/* المرحلة 2 */
+const P=[
+{s:0,l:'ورق تباع الشمس الأزرق',lc:BLUE,o:['يصبح أحمر','يبقى أزرق','يصبح أخضر'],a:0,rc:RED,e:'المحاليل الحمضية تحوّل ورق تباع الشمس الأزرق إلى الأحمر.'},
+{s:2,l:'ورق تباع الشمس الأحمر',lc:RED,o:['يبقى أحمر','يصبح أزرق','يصبح أصفر'],a:1,rc:BLUE,e:'المحاليل القاعدية تحوّل ورق تباع الشمس الأحمر إلى الأزرق.'},
+{s:4,l:'ورق تباع الشمس الأزرق',lc:BLUE,o:['يصبح أحمر','يبقى أزرق دون تغيّر','يصبح ورديًا'],a:1,rc:BLUE,e:'الماء النقي متعادل فلا يغيّر لون ورق تباع الشمس.'}];
+function pk2(k){if(S.pk!==null)return;S.pk=k;snd(true);render()}
+function rv2(){S.pr=true;if(S.pk==P[S.p].a){S.score+=10;snd(true)}else snd(false);render()}
+function nx2(){if(S.p<2){S.p++;S.pk=null;S.pr=false;render()}else go(2)}
+function st2(){const q=P[S.p],m=SM[q.s];
+return `<h2>المرحلة الثانية: تحدي التوقع (${S.p+1} من 3)</h2><p class="lead">توقّع أولًا، ثم يجري المعلم الاختبار أمامكم.</p>
+<div class="box"><div class="lab"><div class="card">${bk(m.c,90)}<b>${m.n}</b></div><div class="card"><div class="sw" style="background:${S.pr?q.rc:q.lc}"></div><b>${q.l}</b></div></div>
+<p><b>ماذا سيحدث للكاشف عند وضع قطرة من العينة عليه؟</b></p>
+<div class="row">${q.o.map((o,k)=>`<button class="o${S.pk===k?' on':''}${S.pr&&k==q.a?' ok':''}" ${S.pk!==null?'disabled':''} onclick="pk2(${k})">${o}</button>`).join('')}</div>
+${S.pk!==null&&!S.pr?`<div class="note warn"><b>دور المعلم الآن:</b> نفّذ الاختبار فعليًا بالعينة الحقيقية. سجّل الطلاب ملاحظتهم قبل الضغط على الزر.</div><button class="main" onclick="rv2()">اعرض النتيجة المتوقعة للمقارنة</button>`:''}
+${S.pr?`<div class="ans ${S.pk==q.a?'g':'b'}"><b>${S.pk==q.a?'توقع صحيح (+10)':'توقع مختلف عن النتيجة المتوقعة'}</b></div><p>${q.e}</p><div class="note">هذه نتيجة عرضها الجهاز للمقارنة وليست ملاحظتكم الفعلية. قارنوها بما رأيتموه في التجربة التي نفّذها المعلم.</div><button class="main" onclick="nx2()">${S.p<2?'الموقف التالي':'إلى مختبر الكواشف'}</button>`:''}</div>`}
+/* المرحلة 3 */
+const IN=['ورق تباع الشمس الأزرق','ورق تباع الشمس الأحمر','الفينولفثالين'];
+function res(t,i,s){
+if(i==0)return t=='a'?[RED,'أحمر','تحوّل إلى الأحمر، وهذا دليل على أن المحلول حمضي.']:[BLUE,'أزرق (لم يتغير)','بقي أزرق. هذا لا يعني أن المحلول حمضي؛ هو قاعدي أو متعادل، ونحتاج إلى اختبار آخر.'];
+if(i==1)return t=='b'?[BLUE,'أزرق','تحوّل إلى الأزرق، وهذا دليل على أن المحلول قاعدي.']:[RED,'أحمر (لم يتغير)','بقي أحمر. هذا لا يعني أن المحلول حمضي؛ هو حمضي أو متعادل، ونحتاج إلى اختبار آخر.'];
+if(t=='b')return s==2?['#f3c3da','وردي باهت','ظهر لون وردي باهت: دليل على أن المحلول قاعدي (قاعديته ضعيفة). تختلف شدة اللون بحسب التركيز.']:['#e8559a','وردي','ظهر لون وردي: دليل على أن المحلول قاعدي.'];
+return ['','عديم اللون','بقي عديم اللون: المحلول ليس قاعديًا، فهو حمضي أو متعادل.']}
+function t3(){if(S.sm===null||S.ind===null)return;const m=SM[S.sm],r=res(m.t,S.ind,S.sm);S.out={r,s:S.sm,i:S.ind};S.log.push(m.n+' + '+IN[S.ind]+': '+r[1]);snd(true);render()}
+function pick3(k,v){S[k]=v;S.out=null;render()}
+function st3(){const o=S.out,m=S.sm!==null?SM[S.sm]:null;
+const liq=o&&o.i==2&&o.r[0]?o.r[0]:(m?m.c:'#edf3f4');
+const sw=o&&o.i<2?o.r[0]:(S.ind===0?BLUE:S.ind===1?RED:'transparent');
+return `<h2>المرحلة الثالثة: مختبر الكواشف</h2>
+<div class="note warn"><b>محاكاة رقمية:</b> النتائج هنا نتائج متوقعة لأغراض التعلم. نفّذوا التطبيق العملي قبل تثبيت الاستنتاج.</div>
+<div class="box"><p><b>1) اختر العينة</b></p><div class="row">${SM.map((x,i)=>`<button class="chip${S.sm===i?' on':''}" onclick="pick3('sm',${i})">${x.n}</button>`).join('')}</div>
+<p><b>2) اختر الكاشف</b></p><div class="row">${IN.map((x,i)=>`<button class="chip${S.ind===i?' on':''}" onclick="pick3('ind',${i})">${x}</button>`).join('')}</div>
+<div class="lab">${bk(liq,110)}${S.ind!==2?`<div><div class="sw" style="background:${sw}"></div><small>شريط الكاشف</small></div>`:''}</div>
+<button class="main" ${S.sm!==null&&S.ind!==null?'':'disabled'} onclick="t3()">اختبر (محاكاة)</button>
+${o?`<div class="note"><b>النتيجة: ${o.r[1]}</b><br>${o.r[2]}</div>`:''}
+<p><b>سجل الأدلة (${S.log.length}):</b></p><div class="log">${S.log.map(x=>`<span>${x}</span>`).join('')||'<small>لا اختبارات بعد.</small>'}</div></div>
+<button class="main" ${S.log.length>=4?'':'disabled'} onclick="go(3)">${S.log.length>=4?'إلى تحدي المحقق':'أجرِ 4 اختبارات على الأقل'}</button>`}
+/* المرحلة 4 */
+const C=[
+{t:'عيّنة مجهولة غيّرت لون ورق تباع الشمس الأزرق إلى الأحمر. ما أفضل استنتاج؟',o:['العينة حمضية، لأن تغيّر الكاشف إلى الأحمر دليل على ذلك','العينة قاعدية، لأن الكاشف تغيّر لونه','العينة متعادلة، لأن شكلها يشبه الماء','لا يمكن استنتاج شيء من أي اختبار'],a:0,e:'الدليل هو تغيّر لون الكاشف، وتحوّل الأزرق إلى الأحمر يدل على الحمضية.'},
+{t:'سائلان عديما اللون متشابهان في المظهر. مع ورق تباع الشمس الأزرق: تحوّل إلى الأحمر مع السائل (أ) وبقي أزرق مع السائل (ب). ما الاستنتاج الأنسب؟',o:['السائلان متماثلان لأنهما بلا لون','(ب) قاعدي حتمًا لأنه لم يغيّر الكاشف','(أ) حمضي، وتشابه المظهر لا يعني تشابه الخصائص','ما حدث خطأ في التجربة'],a:2,e:'(أ) حمضي بدليل الكاشف. أما (ب) فلا نستطيع الجزم بأنه قاعدي، فقد يكون متعادلًا، وهذا يحتاج إلى اختبار آخر.'},
+{t:'قال طالب: «محلول الصابون شفاف مثل الماء، إذن هو متعادل». كيف نقيّم هذا الاستنتاج؟',o:['صحيح، فالشفافية تعني التعادل','خطأ، لأن الصابون حمضي دائمًا','صحيح، لأن الماء أساس كل المحاليل','غير مدعوم بدليل؛ المظهر وحده لا يكفي ونحتاج إلى اختبار بكاشف'],a:3,e:'الاستنتاج بُني على الشكل فقط. الدليل العلمي يأتي من اختبار الكاشف، وليس من المظهر ولا من التخمين.'}];
+function pk4(k){if(S.ck!==null)return;S.ck=k;if(k==C[S.c].a){S.score+=15;snd(true)}else snd(false);render()}
+function nx4(){if(S.c<2){S.c++;S.ck=null;render()}else go(4)}
+function st4(){const q=C[S.c];
+return `<h2>المرحلة الرابعة: تحدي المحقق الكيميائي (${S.c+1} من 3)</h2><p class="lead">اختر الاستنتاج الأفضل، ثم ناقشوا السبب.</p>
+<div class="box"><p><b>${q.t}</b></p><div class="opts">${q.o.map((o,k)=>`<button class="o${S.ck===k?' on':''}${S.ck!==null&&k==q.a?' ok':''}${S.ck===k&&k!=q.a?' no':''}" ${S.ck!==null?'disabled':''} onclick="pk4(${k})">${o}</button>`).join('')}</div>
+${S.ck!==null?`<div class="ans ${S.ck==q.a?'g':'b'}"><b>${S.ck==q.a?'استنتاج سليم (+15)':'الاستنتاج الأفضل هو المميّز بالأخضر'}</b></div><p>${q.e}</p><button class="main" onclick="nx4()">${S.c<2?'الحالة التالية':'إلى السؤال الأخير'}</button>`:''}</div>`}
+/* المرحلة 5 */
+function st5(){return `<h2>المرحلة الأخيرة: سؤال يقود إلى الدرس</h2>
+<div class="box" style="text-align:center"><p style="font-size:1.35rem"><b>إذا عرفنا أن بعض المواد حمضية وبعضها قاعدي، فكيف نميّز بينهما علميًا؟<br>وهل يمكن أن تتفاعل مواد مختلفة لتنتج مادة جديدة؟</b></p>
+<p class="lead">لا نجيب الآن. دوّنوا أفكاركم وأسئلتكم؛ فهي بداية دراسة الحموض والقواعد والأملاح.</p>
+<p>رصيد المحققين: <b>${S.score}</b> من 75 نقطة</p>
+<button class="main" onclick="reset()">أعد المهمة</button></div>`}
+function reset(){Object.assign(S,{st:0,score:0,g:{},rv:false,p:0,pk:null,pr:false,sm:null,ind:null,log:[],out:null,c:0,ck:null});scrollTo(0,0);render()}
+render();
+</script></body></html>
