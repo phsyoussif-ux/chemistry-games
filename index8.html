@@ -1,0 +1,141 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>الحموض تحت المجهر</title>
+<style>
+:root{--bg:#0b1e3a;--c:#13294b;--c2:#23467a;--t:#eaf2ff;--m:#9db4d6;--cy:#4cc9f0;--r:#7db8ff;--p:#5ee0a0;--k:#ffb454;--bad:#ff7b7b}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{background:radial-gradient(circle at 85% 0,#16396b,var(--bg) 60%);color:var(--t);font:clamp(17px,1.6vw,24px)/1.8 Tahoma,"Segoe UI",system-ui,sans-serif;display:flex;flex-direction:column}
+header{padding:10px 4vw;background:#081528;border-bottom:1px solid var(--c2)}
+#steps{display:flex;gap:6px}
+#steps button{flex:1;font:inherit;font-size:.7em;padding:4px 6px;border:0;border-radius:8px;background:var(--c);color:var(--m);cursor:pointer}
+#steps button.on{background:var(--cy);color:#04223a;font-weight:700}
+#steps button.dn{color:var(--p)}
+#bar{height:5px;background:var(--c);border-radius:5px;margin-top:8px;overflow:hidden}
+#bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cy),var(--p));transition:width .5s}
+main{flex:1;overflow:auto;padding:18px 5vw}
+.st{max-width:1100px;margin:auto;animation:in .45s}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+h1{font-size:1.7em;margin:.1em 0 .4em;color:var(--cy)}h2{font-size:1.25em;margin:.8em 0 .3em;color:var(--k)}
+.card{background:var(--c);border:1px solid var(--c2);border-radius:14px;padding:14px 20px;margin:10px 0}
+.c{text-align:center}
+table{width:100%;border-collapse:collapse;background:var(--c);border-radius:12px;overflow:hidden}
+td,th{padding:9px 14px;border-bottom:1px solid var(--c2);text-align:right}th{background:var(--c2)}
+td:first-child{color:var(--k);font-weight:700;white-space:nowrap;width:1%}
+b{color:var(--cy)}b.r{color:var(--r)}b.p{color:var(--p)}b.k{color:var(--k);font-size:1.15em}
+.eq{direction:ltr;display:inline-block;unicode-bidi:isolate;font-family:"Cambria Math","Times New Roman",serif;font-size:1.1em}
+.eqbig{direction:ltr;text-align:center;font-size:1.8em;font-family:"Cambria Math","Times New Roman",serif;margin:.4em 0}
+.eqbig b{font-weight:400}
+.rv{display:none}.rv.on{display:block;animation:in .5s}tr.rv.on{display:table-row}.rv.in.on{display:inline-block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px}
+.grid .card{margin:0}
+.btn,.opt,.sm{font:inherit;border:0;border-radius:10px;padding:8px 20px;background:var(--cy);color:#04223a;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:.45;cursor:default}
+.opts{display:grid;gap:10px;margin:12px 0}
+.opt{background:var(--c2);color:var(--t);text-align:right;font-weight:400}.opt:hover:not(:disabled){background:#2d5798}
+.opt.ok{background:#1d7a55}.opt.no{background:#a23a3a}
+.fb{padding:10px 14px;border-radius:10px;margin:10px 0}.fb.g{background:#123f33}.fb.b{background:#4a2330}
+.meta{color:var(--m);display:flex;justify-content:space-between}.qt{font-size:1.2em;margin:.4em 0}
+.cnt{margin:8px auto;width:auto}.cnt td,.cnt th{text-align:center;padding:4px 18px}.bad{color:var(--bad)}.good{color:var(--p)}
+.warn{background:#4a2a12;border:2px solid var(--k);border-radius:12px;padding:12px 18px}
+.pause{background:#102f55;border:2px dashed var(--cy);border-radius:12px;padding:8px 16px;text-align:center}
+textarea{width:100%;min-height:200px;background:#0d2240;color:var(--t);border:2px solid var(--c2);border-radius:12px;padding:12px;font:inherit;resize:vertical}
+.board{min-height:280px;border:3px dashed var(--c2);border-radius:14px;margin:10px 0;display:flex;align-items:flex-start;padding:10px;color:#4a6a98;font-size:.8em}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.sm{background:var(--c2);color:var(--t);padding:4px 16px}.sm.on{background:var(--k);color:#2a1700}
+.ans{border-color:var(--p)}
+.cl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0}.cl .eq{min-width:90px;font-size:1.3em}
+footer{display:flex;gap:10px;justify-content:space-between;padding:10px 4vw;background:#081528;border-top:1px solid var(--c2)}
+footer .btn{background:var(--c2);color:var(--t)}footer #nx{background:var(--cy);color:#04223a}
+</style></head><body>
+<header><div id="steps"></div><div id="bar"><i></i></div></header>
+<main id="m"></main>
+<footer><button class="btn" id="pv">▸ السابق</button><button class="btn" id="rt">↻ إعادة المحاولة</button><button class="btn" id="nx">التالي ◂</button></footer>
+<script>
+const $=(s,e=document)=>e.querySelector(s);
+const F=s=>s.replace(/\^([0-9]*[+-])/g,'<sup>$1</sup>').replace(/([A-Za-z\)])(\d+)/g,'$1<sub>$2</sub>').replace(/\{(\w)\|([^}]*)\}/g,'<b class="$1">$2</b>').replace(/\[\[(.*?)\]\]/g,'<span class="eq" dir="ltr">$1</span>');
+function reveal(el){const it=[...el.querySelectorAll('.rv')],b=$('.nx',el);let i=0;
+ const u=()=>{b.textContent=i<it.length?'إظهار التالي ◂ ('+i+'/'+it.length+')':'اكتمل العرض ✓';b.disabled=i>=it.length};
+ b.onclick=()=>{it[i].classList.add('on');if(!it[i].classList.contains('in'))it[i].scrollIntoView({behavior:'smooth',block:'nearest'});i++;u()};u()}
+function quiz(el,qs,timed,endMsg){let i=0,s=0,tm;
+ const show=()=>{clearInterval(tm);if(i>=qs.length){const m=endMsg||(s>=4?'ممتاز! مفاهيمك راسخة.':s>=3?'جيد، راجع البطاقات وأعد المحاولة.':'راجع بطاقات المرحلة الأولى ثم أعد المحاولة.');
+  el.innerHTML='<div class="card c"><h2>نتيجتك: '+s+' / '+qs.length+'</h2><p>'+m+'</p></div>';return}
+  const q=qs[i];let t=10,done=false;
+  el.innerHTML='<div class="card"><div class="meta"><span>سؤال '+(i+1)+' من '+qs.length+'</span><span id="tm"></span></div><div class="qt">'+F(q.q)+'</div><div class="opts">'+q.o.map((o,j)=>'<button class="opt" data-j="'+j+'">'+F(o)+'</button>').join('')+'</div><div id="fb"></div></div>';
+  const fin=j=>{if(done)return;done=true;clearInterval(tm);const ok=j===q.a;if(ok)s++;
+   el.querySelectorAll('.opt').forEach((b,k)=>{b.disabled=true;if(k===q.a)b.classList.add('ok');else if(k===j)b.classList.add('no')});
+   $('#fb',el).innerHTML='<div class="fb '+(ok?'g':'b')+'">'+(j<0?'⏰ انتهى الوقت. ':ok?'✔ إجابة صحيحة. ':'✘ إجابة غير صحيحة. ')+F(q.w)+'</div><button class="btn nq">'+(i<qs.length-1?'السؤال التالي ◂':'عرض النتيجة')+'</button>';
+   $('.nq',el).onclick=()=>{i++;show()}};
+  el.querySelectorAll('.opt').forEach(b=>b.onclick=()=>fin(+b.dataset.j));
+  if(timed()){const T=$('#tm',el);T.textContent='⏱ 10';tm=setInterval(()=>{t--;T.textContent='⏱ '+t;if(t<=0)fin(-1)},1000)}}
+ show()}
+const cnt=(a,b,rows)=>'<table class="cnt"><tr><th>الذرة</th><th>قبل التفاعل</th><th>بعد التفاعل</th><th></th></tr>'+rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="'+(r[1]==r[2]?'good':'bad')+'">'+(r[1]==r[2]?'✔':'✘')+'</td></tr>').join('')+'</table>';
+
+function s1(el){
+ const rows=[['تعريف الحموض','مواد <b>تنتج أيونات الهيدروجين الموجبة</b> [[H^+]] عند ذوبانها في الماء.'],
+ ['تأين الحمض في الماء','يتفكك الحمض في الماء إلى <b>أيون الهيدروجين</b> [[H^+]] وأيون سالب، مثل: [[HCl(aq) → H^+(aq) + Cl^-(aq)]]'],
+ ['التوصيل الكهربائي','محاليلها <b>موصلة للتيار الكهربائي</b>؛ لوجود <b>أيونات حرة الحركة</b> موجبة وسالبة في المحلول.'],
+ ['التفاعل مع الفلزات','تتفاعل مع <b>بعض الفلزات</b> منتجة <b>ملحاً وغاز الهيدروجين</b> [[H2]]؛ إذ يحل الفلز محل الهيدروجين في الحمض.'],
+ ['الكواشف','تحوّل <b>ورقة تباع الشمس الزرقاء</b> إلى اللون <b>الأحمر</b>.']];
+ const cards=['الحمض مادة تنتج أيونات [[H^+]] عند ذوبانها في الماء.','تأين الحمض هو تفككه في الماء إلى أيونات.','الأيونات حرة الحركة تجعل محلول الحمض موصلاً للتيار الكهربائي.','فلز + حمض ← ملح + غاز الهيدروجين.','الحمض يحوّل ورقة تباع الشمس الزرقاء إلى الأحمر.'];
+ el.innerHTML='<h1>الحموض تحت المجهر: هل أتقنتها؟</h1><table><tr><th>المحور</th><th>الخلاصة</th></tr>'+rows.map(r=>'<tr class="rv"><td>'+r[0]+'</td><td>'+F(r[1])+'</td></tr>').join('')+'</table><h2>خمس معلومات أساسية</h2><div class="grid">'+cards.map((c,i)=>'<div class="card rv"><b>'+(i+1)+'</b> — '+F(c)+'</div>').join('')+'</div><p><button class="btn nx"></button></p>';
+ reveal(el)}
+
+const Q2=[{q:'الحمض مادة تنتج أيونات الهيدروجين الموجبة [[H^+]] عند ذوبانها في الماء.',o:['صح','خطأ'],a:0,w:'هذا هو تعريف الحمض في الكتاب.'},
+{q:'تُوصل محاليل الحموض التيار الكهربائي بسبب:',o:['وجود أيونات حرة الحركة','وجود جزيئات متعادلة فقط','وجود ذرات هيدروجين فقط','ذوبان الفلزات فيها'],a:0,w:'يتأين الحمض فينتج أيونات موجبة وسالبة حرة الحركة تنقل التيار.'},
+{q:'أكمل: تغيّر الحموض لون ورقة تباع الشمس الزرقاء إلى اللون ____',o:['الأحمر','الأخضر','الأصفر','لا تغيّر لونها'],a:0,w:'ورقة تباع الشمس الزرقاء تتحول إلى الأحمر في الوسط الحمضي.'},
+{q:'لماذا يتفاعل المغنيسيوم مع حمض الهيدروكلوريك؟',o:['لأنه يحل محل الهيدروجين في الحمض','لأنه يتأين في الماء','لأنه يزيد أيونات الكلوريد','لأنه يُنتج غاز الأكسجين'],a:0,w:'يحل الفلز محل ذرة الهيدروجين في الحمض فيتكوّن الملح ويتصاعد غاز الهيدروجين.'},
+{q:'ينتج عن تفاعل الفلز مع الحمض غاز الأكسجين.',o:['صح','خطأ'],a:1,w:'الغاز الناتج هو الهيدروجين [[H2]] وليس الأكسجين.'}];
+function s2(el){el.innerHTML='<h1>اختبار سريع جداً</h1><p><label><input type="checkbox" id="tmr"> تفعيل مؤقّت 10 ثوانٍ لكل سؤال (اختياري)</label></p><div id="q"></div>';quiz($('#q',el),Q2,()=>$('#tmr').checked)}
+
+function s3(el){
+ el.innerHTML='<p class="card c">«عرفنا خصائص الحموض، والآن سنرى كيف نترجم هذه الخصائص إلى معادلات كيميائية»</p>'+
+ '<p class="c">الألوان: <b class="r">متفاعل</b> · <b class="p">ناتج</b> · <b class="k">معامل الموازنة</b></p>'+
+ '<h1>أولاً: تأين الحمض في الماء</h1>'+
+ '<div class="card rv"><b>التأين:</b> تفكك الحمض عند ذوبانه في الماء إلى أيونات، منها أيون الهيدروجين الموجب [[H^+]].</div>'+
+ '<div class="eqbig"><span class="rv in">'+F('{r|HCl(aq)}')+'</span> <span class="rv in">→</span> <span class="rv in">'+F('{p|H^+(aq)} + {p|Cl^-(aq)}')+'</span></div>'+
+ '<div class="card rv">'+F('<b>معنى الرموز:</b> [[(aq)]] المادة ذائبة في الماء · [[H^+]] أيون هيدروجين موجب · [[Cl^-]] أيون كلوريد سالب · [[→]] ينتج. يتفكك جزيء HCl إلى أيون [[H^+]] وأيون [[Cl^-]].')+'</div>'+
+ '<div class="card rv" id="cl"><p>ميّز: هل المادة <b class="r">متفاعل</b> أم <b class="p">ناتج</b>؟</p>'+[['HCl','r'],['H^+','p'],['Cl^-','p']].map(x=>'<div class="cl" data-a="'+x[1]+'"><span class="eq">'+F(x[0])+'</span><button class="sm" data-v="r">متفاعل</button><button class="sm" data-v="p">ناتج</button><span></span></div>').join('')+'</div>'+
+ '<h1>ثانياً: تفاعل الحمض مع الفلز</h1>'+
+ '<div class="card c rv" style="font-size:1.3em">'+F('{r|فلز} + {r|حمض} ← {p|ملح} + {p|غاز الهيدروجين}')+'</div>'+
+ '<div class="rv"><p class="c">المعادلة <b>غير موزونة</b>:</p><div class="eqbig">'+F('{r|Mg} + {r|HCl} → {p|MgCl2} + {p|H2}')+'</div>'+cnt(0,0,[['Mg',1,1],['H',1,2],['Cl',1,2]])+'</div>'+
+ '<div class="rv"><p class="c">نضع المعامل <b class="k">2</b> أمام HCl:</p><div class="eqbig">'+F('{r|Mg} + {k|2}{r|HCl} → {p|MgCl2} + {p|H2}')+'</div>'+cnt(0,0,[['Mg',1,1],['H',2,2],['Cl',2,2]])+'</div>'+
+ [['ما المتفاعلات؟','[[Mg]] و[[HCl]].'],['ما النواتج؟','[[MgCl2]] و[[H2]].'],['كيف عرفنا اسم الملح؟','اسمه من اسم الفلز مع أنيون الحمض: أنيون [[Cl^-]] «كلوريد» + المغنيسيوم = <b>كلوريد المغنيسيوم</b>.'],['لماذا وضعنا 2 أمام HCl؟','لأن [[MgCl2]] فيه ذرتا كلور، و[[H2]] فيه ذرتا هيدروجين، فنحتاج جزيئين من HCl لتتساوى الذرات. (لا نغيّر الأرقام السفلية في الصيغ.)'],['كيف نتحقق من الوزن؟','نعدّ كل ذرة على الجانبين: Mg ‏1=1، H ‏2=2، Cl ‏2=2.']].map(x=>'<div class="card rv"><b class="k">'+x[0]+'</b><br>'+F(x[1])+'</div>').join('')+
+ '<p><button class="btn nx"></button></p>';
+ el.querySelectorAll('.cl').forEach(d=>d.querySelectorAll('button').forEach(b=>b.onclick=()=>{const ok=b.dataset.v===d.dataset.a,o=d.lastChild;o.textContent=ok?'✔ صحيح':'✘ حاول مجدداً';o.className=ok?'good':'bad'}));
+ reveal(el)}
+
+function s4(el){
+ el.innerHTML='<h1>من المعادلة إلى الواقع: تجربة المغنيسيوم وحمض الهيدروكلوريك</h1>'+
+ '<div class="warn">⚠️ <b style="color:var(--k)">تنبيه:</b> ينتج التفاعل غاز الهيدروجين [[H2]] <b>القابل للاشتعال</b>، وحمض الهيدروكلوريك مادة <b>أكّالة</b>. تُجرى التجربة <b>بإشراف المعلم/المختص فقط</b> ووفق تعليمات المختبر، ولا يجريها الطلاب بأنفسهم.</div>'.replace(/\[\[(.*?)\]\]/g,(m,a)=>F(m))+
+ '<div class="card"><b>اسم التجربة:</b> تفاعل فلز المغنيسيوم مع حمض الهيدروكلوريك<br><b>الهدف:</b> ربط المعادلة الكيميائية بما نشاهده عند حلول المغنيسيوم محل الهيدروجين في الحمض.</div>'+
+ '<div class="eqbig card">'+F('{r|Mg(s)} + {k|2}{r|HCl(aq)} → {p|MgCl2(aq)} + {p|H2(g)}')+'</div>'+
+ '<div class="pause">⏸ أوقِف العرض هنا، ونفّذ التجربة أمام الطلاب، ثم عُد لتدوين ما نلاحظه.</div>'+
+ [['ماذا تتوقع أن يحدث؟'],['ملاحظاتنا أثناء التجربة'],['كيف نفسر ما شاهدناه؟']].map(x=>'<h2>'+x[0]+'</h2><textarea aria-label="'+x[0]+'"></textarea>').join('')}
+
+const Q5=[['في المعادلة [[Mg + 2HCl → MgCl2 + H2]] حدّد المتفاعلات والنواتج.','المتفاعلات: [[Mg]] و[[HCl]] — النواتج: [[MgCl2]] و[[H2]].'],
+['أكمل نواتج التفاعل: [[Mg + H2SO4 → ؟ + ؟]]','[[Mg + H2SO4 → MgSO4 + H2]] — الناتجان: ملح (كبريتات المغنيسيوم) وغاز الهيدروجين.'],
+['اكتب معادلة تأين حمض الكبريتيك في الماء.','[[H2SO4(aq) → 2H^+(aq) + SO4^2-(aq)]]'],
+['وازن المعادلة: [[Mg + HCl → MgCl2 + H2]]','[[Mg + {k|2}HCl → MgCl2 + H2]] — التحقق: Mg ‏1=1، H ‏2=2، Cl ‏2=2.'],
+['تطبيق: لحمض النيتريك [[HNO3]]، اكتب معادلة تأينه، ثم فسّر سبب توصيل محلوله للتيار الكهربائي.','[[HNO3(aq) → H^+(aq) + NO3^-(aq)]] — لأن المحلول يحتوي أيونات موجبة وسالبة حرة الحركة.']];
+const L5=['١. تحديد المتفاعلات والنواتج','٢. نواتج فلز + حمض','٣. تأين حمض','٤. موازنة Mg + HCl','٥. سؤال تطبيقي'];
+function s5(el){let n=0;
+ el.innerHTML='<h1>تحدي الكيميائيين: أنت الآن تكتب المعادلة!</h1><div class="tabs">'+L5.map((l,i)=>'<button class="sm" data-i="'+i+'">'+l+'</button>').join('')+'</div><div id="b"></div>';
+ const draw=()=>{el.querySelectorAll('.tabs .sm').forEach((b,i)=>b.classList.toggle('on',i==n));
+  $('#b',el).innerHTML='<div class="card"><div class="qt"><b class="k">السؤال '+(n+1)+':</b> '+F(Q5[n][0])+'</div></div><h2>مساحة الحل على اللوح</h2><div class="board"></div><button class="btn" id="sa">إظهار الإجابة</button><div id="an"></div>';
+  $('#sa',el).onclick=()=>{$('#an',el).innerHTML='<div class="card ans"><b class="p">الإجابة:</b> '+F(Q5[n][1])+'</div>';$('#sa',el).disabled=true}};
+ el.querySelectorAll('.tabs .sm').forEach(b=>b.onclick=()=>{n=+b.dataset.i;draw()});draw()}
+
+const Q6=[{q:'أي معادلة تعبّر عن تأين حمض الهيدروكلوريك في الماء؟',o:['[[HCl(aq) → H^+(aq) + Cl^-(aq)]]','[[HCl → H2 + Cl2]]','[[HCl → H^- + Cl^+]]'],a:0,w:'الحمض مادة تنتج أيونات [[H^+]] عند ذوبانها في الماء ويتأين إلى أيون موجب وآخر سالب.'},
+{q:'ما ناتجا تفاعل الفلز مع الحمض؟',o:['ملح وغاز الهيدروجين','ملح وغاز الأكسجين','غاز الهيدروجين فقط'],a:0,w:'فلز + حمض ← ملح + غاز الهيدروجين.'},
+{q:'أي معادلة موزونة صحيحة؟',o:['[[Mg + HCl → MgCl2 + H2]]','[[Mg + 2HCl → MgCl2 + H2]]','[[Mg + 2HCl → MgCl + H2]]'],a:1,w:'في المعادلة الصحيحة: Mg ‏1=1، H ‏2=2، Cl ‏2=2.'}];
+function s6(el){el.innerHTML='<h1>بطاقة الخروج</h1><div id="q"></div><div class="card c" id="fin" style="display:none;font-size:1.15em">أنت لا تحفظ الكيمياء… أنت تفهمها: افهم ماذا يحدث، ثم طبّقه في معادلة موزونة، فتتقن الكيمياء خطوة بعد خطوة. 🌟</div>';
+ quiz($('#q',el),Q6,()=>false,'أحسنت إتمام البطاقة!');
+ new MutationObserver(()=>{if($('#q h2',el))$('#fin',el).style.display='block'}).observe($('#q',el),{childList:true})}
+
+const G=[['تثبيت الخصائص',s1],['اختبار سريع',s2],['المعادلات',s3],['التجربة العملية',s4],['تحدي اللوح',s5],['بطاقة الخروج',s6]];let cur=0;
+$('#steps').innerHTML=G.map((g,i)=>'<button>'+(i+1)+'. '+g[0]+'</button>').join('');
+function go(n){cur=Math.max(0,Math.min(G.length-1,n));const e=document.createElement('div');e.className='st';$('#m').replaceChildren(e);G[cur][1](e);$('#m').scrollTop=0;
+ document.querySelectorAll('#steps button').forEach((b,i)=>{b.className=i==cur?'on':i<cur?'dn':''});
+ $('#bar i').style.width=((cur+1)/G.length*100)+'%';$('#pv').disabled=cur==0;$('#nx').disabled=cur==G.length-1}
+document.querySelectorAll('#steps button').forEach((b,i)=>b.onclick=()=>go(i));
+$('#pv').onclick=()=>go(cur-1);$('#nx').onclick=()=>go(cur+1);$('#rt').onclick=()=>go(cur);
+document.onkeydown=e=>{if(/TEXTAREA|INPUT/.test(e.target.tagName))return;if(e.key=='ArrowLeft')go(cur+1);if(e.key=='ArrowRight')go(cur-1)};
+go(0);
+</script></body></html>
