@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مختبر القوة والـ pH</title>
+<style>
+:root{--bg:#0b1b33;--card:#13294b;--line:#27487a;--tx:#eaf2ff;--mut:#9db4d6;--cy:#22d3ee;--or:#fb923c;--gr:#34d399;--rd:#f87171}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0,#16335f,var(--bg));color:var(--tx);font-family:Tahoma,"Segoe UI",Arial,sans-serif;min-height:100vh}
+#top{position:sticky;top:0;background:#0b1b33ee;padding:10px 18px;border-bottom:1px solid var(--line);z-index:5}
+#stages{display:flex;gap:6px;margin-bottom:6px}#stages i{flex:1;height:8px;border-radius:4px;background:var(--line)}#stages i.on{background:var(--cy)}#stages i.ok{background:var(--gr)}
+#hd{display:flex;justify-content:space-between;font-size:15px;color:var(--mut)}
+main{max-width:980px;margin:18px auto;padding:0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;animation:in .4s}
+@keyframes in{from{opacity:0;transform:translateY(10px)}}
+h2{margin:0 0 8px;color:var(--cy);font-size:26px}p{font-size:19px;line-height:1.9;margin:8px 0}
+.eq{direction:ltr;unicode-bidi:isolate;display:block;text-align:center;background:#0a1730;border-radius:10px;padding:10px;font-size:22px;margin:10px 0;color:#fff}
+button{font:inherit;font-size:18px;border:0;border-radius:10px;padding:10px 18px;margin:4px;cursor:pointer;background:#1f3d6e;color:var(--tx);transition:.15s}
+button:hover{background:#2a5190}button.pri{background:var(--cy);color:#04202b;font-weight:bold}button.sel{outline:3px solid var(--or)}button:disabled{opacity:.35;cursor:not-allowed}
+.ok{color:var(--gr)}.bad{color:var(--rd)}.note{background:#3a2a10;border-right:5px solid var(--or);padding:10px 14px;border-radius:8px;font-size:18px;margin:10px 0}
+.row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;align-items:flex-start}
+canvas{background:#0d2447;border:2px solid var(--line);border-radius:6px 6px 24px 24px}
+.fb{min-height:30px;font-size:18px;margin:8px 0}
+#nav{display:flex;justify-content:space-between;margin-top:14px}
+.leg span{margin:0 8px;font-size:16px}.dot{display:inline-block;width:13px;height:13px;border-radius:50%;vertical-align:middle;margin-left:4px}
+.bar{height:16px;border-radius:8px;background:linear-gradient(90deg,#ef3340,#f7931e,#f6ec3a,#52b755,#2fb05a,#16b5ac,#3a5fae,#6a2c8a,#46286f)}
+input[type=range]{width:100%;accent-color:var(--cy)}
+.big{font-size:54px;text-align:center;font-weight:bold}
+.tm{height:10px;background:var(--line);border-radius:5px;overflow:hidden}.tm b{display:block;height:100%;background:var(--or);width:100%}
+.opt{display:block;width:100%;text-align:right;margin:6px 0}
+.mini{display:flex;align-items:center;gap:8px;margin:5px 0}.mini div{height:14px;background:var(--cy);border-radius:7px;transition:width .6s}
+</style></head><body>
+<div id="top"><div id="stages"></div><div id="hd"><span id="stn"></span><span>⭐ النقاط: <b id="pts">0</b></span></div></div>
+<main><div class="card" id="box"></div><div id="nav"><button id="pv">→ السابق</button><button id="rs">↻ إعادة المشهد</button><button id="nx" class="pri">التالي ←</button></div></main>
+<script>
+const $=s=>document.querySelector(s),box=$('#box');
+const C={H:'#f87171',A:'#22d3ee',M:'#fb923c',O:'#60a5fa',mol:'#cbd5e1'};
+const eq=t=>`<span class="eq">${t}</span>`;
+let pts=0,idx=0,anims=[],okSet={},tally={a:[0,0],p:[0,0],c:[0,0],t:[0,0]};
+const STN=['نفهم قوة الحمض والقاعدة','لماذا تختلف القوة؟ والتوصيل','ما هو الرقم الهيدروجيني pH؟','كيف نقيس pH؟','تحديات التفكير','تحدي السرعة'];
+/* ---------- beaker animation ---------- */
+function beaker(cv,frac,type,n){n=n||24;const x=cv.getContext('2d'),W=cv.width,H=cv.height;let U=[];
+ const rp=()=>({x:20+Math.random()*(W-40),y:30+Math.random()*(H-50),vx:(Math.random()-.5)*1.6,vy:(Math.random()-.5)*1.6});
+ for(let i=0;i<n;i++)U.push({a:rp(),b:rp(),ion:false});
+ const o={set(f){const k=Math.round(f*n);U.forEach((u,i)=>u.ion=i<k)},cnt(){return U.filter(u=>u.ion).length}};o.set(frac);let t=0,live=true;
+ const mv=p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<14||p.x>W-14)p.vx*=-1;if(p.y<24||p.y>H-14)p.vy*=-1};
+ const dr=(p,c,l,r)=>{x.beginPath();x.fillStyle=c;x.arc(p.x,p.y,r||10,0,7);x.fill();x.fillStyle='#04121f';x.font='bold 11px Arial';x.textAlign='center';x.fillText(l,p.x,p.y+4)};
+ (function f(){if(!live)return;t++;x.clearRect(0,0,W,H);
+  if(t%90==0&&frac>0&&frac<1){const i=U.filter(u=>u.ion),m=U.filter(u=>!u.ion);if(i.length&&m.length){const a=i[Math.random()*i.length|0],b=m[Math.random()*m.length|0];a.ion=false;b.ion=true;b.b.x=b.a.x+20}}
+  U.forEach(u=>{mv(u.a);if(u.ion){mv(u.b);dr(u.a,type=='a'?C.H:C.M,type=='a'?'H⁺':'M⁺');dr(u.b,type=='a'?C.A:C.O,type=='a'?'A⁻':'OH⁻',type=='a'?10:11)}
+   else{u.b.x=u.a.x+16;u.b.y=u.a.y;dr(u.a,C.mol,type=='a'?'H':'M',9);dr(u.b,'#94a3b8',type=='a'?'A':'OH',9)}});
+  requestAnimationFrame(f)})();
+ anims.push(()=>live=false);return o}
+const mkcv=(w,h)=>{const c=document.createElement('canvas');c.width=w||260;c.height=h||230;return c};
+const legend=t=>t=='a'?`<div class="leg"><span><i class="dot" style="background:${C.H}"></i>H⁺</span><span><i class="dot" style="background:${C.A}"></i>أيون سالب (A⁻)</span><span><i class="dot" style="background:${C.mol}"></i>جزيء لم يتأين (HA)</span></div>`:`<div class="leg"><span><i class="dot" style="background:${C.M}"></i>أيون موجب (M⁺)</span><span><i class="dot" style="background:${C.O}"></i>OH⁻</span><span><i class="dot" style="background:${C.mol}"></i>جزيء لم يتأين</span></div>`;
+/* ---------- scenes ---------- */
+const sc=[];
+sc.push({s:0,f(el,ok){let seen={};el.innerHTML=`<h2>ماذا يحدث عند الذوبان في الماء؟</h2><p>عندما يذوب <b>الحمض</b> في الماء ينتج أيونات الهيدروجين الموجبة <b>H⁺</b> وأيونات سالبة أخرى. وعندما تذوب <b>القاعدة</b> ينتج أيونات الهيدروكسيد السالبة <b>OH⁻</b> وأيونات موجبة أخرى. هذه العملية تسمى <b>التأيّن</b>: تحوّل المادة إلى أيونات في الماء.</p><div class="row"><button id="b1">أذوّب حمضًا</button><button id="b2">أذوّب قاعدة</button></div><div class="row" id="cv"></div><div id="lg"></div><div class="note" id="tx">اختر حمضًا أو قاعدة لترى ما يحدث.</div>`;
+  const go=t=>{anims.forEach(f=>f());anims=[];seen[t]=1;const c=mkcv(420,200);$('#cv').innerHTML='';$('#cv').append(c);const b=beaker(c,0,t,14);let k=0;const iv=setInterval(()=>{k+=1/14;b.set(Math.min(k,1));if(k>=1)clearInterval(iv)},250);anims.push(()=>clearInterval(iv));$('#lg').innerHTML=legend(t);
+   $('#tx').innerHTML=t=='a'?'الحمض (HA) ينتج <b>H⁺</b> + أيونًا سالبًا. أيونات H⁺ هي المسؤولة عن الخصائص الحمضية.':'القاعدة (MOH) تنتج <b>OH⁻</b> + أيونًا موجبًا. أيونات OH⁻ هي المسؤولة عن الخصائص القاعدية.';if(seen.a&&seen.b)ok()};
+  $('#b1').onclick=()=>go('a');$('#b2').onclick=()=>go('b')}});
+sc.push({s:0,f(el,ok){let seen={},cur=null;el.innerHTML=`<h2>الحمض القوي والحمض الضعيف</h2><p>الحمض <b>القوي</b> يتأيّن <b>كليًّا</b> فيحتوي محلوله على أيونات فقط. الحمض <b>الضعيف</b> يتأيّن <b>جزئيًّا</b> فيحتوي محلوله على أيونات وجزيئات حمض لم تتأيّن.</p><div class="row"><button id="b1">HCl (حمض قوي)</button><button id="b2">CH₃COOH (حمض ضعيف)</button></div><div class="row"><canvas id="c" width="420" height="220"></canvas></div><div id="lg">${legend('a')}</div><div id="e"></div><div class="fb" id="tx">اضغط على الحمضين لتقارن.</div>`;
+  const b=beaker($('#c'),1,'a',24);const sh=k=>{seen[k]=1;if(k==1){b.set(1);$('#e').innerHTML=eq('HCl<sub>(aq)</sub> → H⁺<sub>(aq)</sub> + Cl⁻<sub>(aq)</sub>');$('#tx').innerHTML='سهم واحد → تأيّن <b>كلّي</b>: كل الجزيئات صارت أيونات.'}else{b.set(.12);$('#e').innerHTML=eq('CH₃COOH<sub>(aq)</sub> ⇌ H⁺<sub>(aq)</sub> + CH₃COO⁻<sub>(aq)</sub>');$('#tx').innerHTML='سهمان متعاكسان → تأيّن <b>جزئي</b>: أيونات + جزيئات لم تتأيّن (لاحظ أن الأيونات تتكون وتعود جزيئات).'}if(seen[1]&&seen[2])ok()};
+  $('#b1').onclick=()=>sh(1);$('#b2').onclick=()=>sh(2);sh(1);seen[2]=0}});
+sc.push({s:0,f(el,ok){let seen={};const D={NaOH:['NaOH<sub>(aq)</sub> → Na⁺<sub>(aq)</sub> + OH⁻<sub>(aq)</sub>','قاعدة قوية'],KOH:['KOH<sub>(aq)</sub> → K⁺<sub>(aq)</sub> + OH⁻<sub>(aq)</sub>','قاعدة قوية'],'Ca(OH)₂':['Ca(OH)₂<sub>(aq)</sub> → Ca²⁺<sub>(aq)</sub> + 2OH⁻<sub>(aq)</sub>','قاعدة قوية (تنتج أيونَي OH⁻ لكل وحدة)'],'NH₃':['NH₃<sub>(g)</sub> + H₂O<sub>(l)</sub> ⇌ NH₄⁺<sub>(aq)</sub> + OH⁻<sub>(aq)</sub>','قاعدة ضعيفة (مثال من الكتاب): تتأيّن جزئيًا']};
+  el.innerHTML=`<h2>القواعد القوية والضعيفة</h2><p>القاعدة <b>القوية</b> تتأيّن كليًّا وتنتج OH⁻ بنسبة كبيرة، و<b>الضعيفة</b> تتأيّن جزئيًّا. أيونات OH⁻ هي المسؤولة عن الخصائص القاعدية. اضغط كل قاعدة (من جدول الكتاب):</p><div class="row">${Object.keys(D).map(k=>`<button data-k="${k}">${k}</button>`).join('')}</div><div id="e"></div><div class="fb" id="tx"></div>`;
+  el.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k;seen[k]=1;$('#e').innerHTML=eq(D[k][0]);$('#tx').innerHTML=D[k][1];if(Object.keys(D).every(x=>seen[x]))ok()})}});
+sc.push({s:0,f(el,ok){let got={};el.innerHTML=`<h2>🎯 نشاط: أي كأس فيه أيونات أكثر؟</h2><p>الكأسان لمحلولين متساويين في التركيز. اختر الكأس الذي فيه نسبة أكبر من الأيونات.</p><div id="qs"></div>`;
+  [['a','حمضين',[1,.1]],['b','قاعدتين',[.12,1]]].forEach(([t,nm,fr],q)=>{const d=document.createElement('div');d.innerHTML=`<h3>${q+1}) كأسان لـ${nm}</h3><div class="row"><div><canvas width="260" height="190"></canvas><br><button>الكأس A</button></div><div><canvas width="260" height="190"></canvas><br><button>الكأس B</button></div></div><div class="fb"></div>`;$('#qs').append(d);const cs=d.querySelectorAll('canvas'),bs=d.querySelectorAll('button');cs.forEach((c,i)=>beaker(c,fr[i],t,20));
+   bs.forEach((b,i)=>b.onclick=()=>{const right=fr[i]==1;d.querySelector('.fb').innerHTML=right?`<span class="ok">✔ صحيح! تأيّن كلّي ← أيونات أكثر ← ${t=='a'?'حمض قوي':'قاعدة قوية'}.</span>`:'<span class="bad">لاحظ وجود جزيئات لم تتأيّن في هذا الكأس؛ جرّب الآخر.</span>';if(right){if(!got[q])pts+=10,$('#pts').textContent=pts;got[q]=1;if(got[0]&&got[1])ok()}})})}});
+sc.push({s:1,f(el,ok){let seen={};const D={HCl:[1,'a','HCl: حمض قوي'],'CH₃COOH':[.12,'a','CH₃COOH: حمض ضعيف'],NaOH:[1,'b','NaOH: قاعدة قوية'],'NH₃':[.12,'b','NH₃: قاعدة ضعيفة']};
+  el.innerHTML=`<h2>الأيونات الحرة المتحركة تُضيء المصباح</h2><p>المحلول يوصل التيار بالأيونات الحرة المتحركة؛ كلما زاد عددها زادت قدرة التوصيل. اختر محلولًا (كلها <b>بنفس التركيز</b>):</p><div class="row">${Object.keys(D).map(k=>`<button data-k="${k}">${k}</button>`).join('')}</div>
+  <div class="row"><svg id="sv" width="420" height="190" viewBox="0 0 420 190"><rect x="20" y="120" width="50" height="40" fill="#555" stroke="#aaa"/><text x="45" y="145" fill="#fff" font-size="13" text-anchor="middle">بطارية</text><path d="M70 130H120M300 130H350V60M120 130V100M300 130V100" stroke="#ccc" stroke-width="3" fill="none"/><rect x="110" y="95" width="200" height="85" fill="#22d3ee33" stroke="#22d3ee"/><circle id="lp" cx="350" cy="40" r="26" fill="#fde047" opacity=".08"/><circle cx="350" cy="40" r="26" fill="none" stroke="#fff" stroke-width="2"/><text x="350" y="86" fill="#fff" font-size="13" text-anchor="middle">مصباح</text></svg><canvas id="c" width="260" height="190"></canvas></div><div class="fb" id="tx">اختر محلولًا.</div><div class="note">⚠️ القوة ≠ التركيز: القوة تعني نسبة التأيّن، والتركيز يعني كمية المذاب في المحلول. لذلك نقارن بين محاليل <b>متساوية التركيز</b>.</div>`;
+  let b=null;el.querySelectorAll('[data-k]').forEach(x=>x.onclick=()=>{const k=x.dataset.k,d=D[k];seen[k]=1;anims.forEach(f=>f());anims=[];const c=$('#c');b=beaker(c,d[0],d[1],24);$('#lp').setAttribute('opacity',d[0]==1?1:.3);$('#tx').innerHTML=`${d[2]} ← ${d[0]==1?'أيونات كثيرة ← المصباح <b>ساطع</b>':'أيونات أقل ← المصباح <b>خافت</b>'}`;if(Object.keys(D).every(z=>seen[z]))ok()})}});
+sc.push({s:1,f(el,ok){el.innerHTML=`<h2>القوة ليست التركيز!</h2><p>كأس A: حمض <b>ضعيف</b> مركّز (24 جزيئًا مذابًا). كأس B: حمض <b>قوي</b> مخفّف (8 جزيئات). قارن نسبة التأيّن في كل كأس:</p><div class="row"><div><canvas id="a" width="260" height="190"></canvas><div class="leg">A: ضعيف مركّز</div></div><div><canvas id="b" width="260" height="190"></canvas><div class="leg">B: قوي مخفّف</div></div></div><div class="note">في A نسبة التأيّن قليلة رغم كثرة الجزيئات، وفي B كل الجزيئات تأيّنت. إذن: <b>الحمض المركّز ليس بالضرورة قويًّا</b>، والحمض القوي قد يكون مخفّفًا. لا نحكم على القوة إلا بنسبة التأيّن.</div><button class="pri" id="g">فهمت الفرق ✔</button>`;beaker($('#a'),.12,'a',24);beaker($('#b'),1,'a',8);$('#g').onclick=ok}});
+sc.push({s:2,f(el,ok){let v={};const N=['حمض بطارية السيارة','حمض المعدة','الخل','عصير برتقال','بندورة','القهوة','حليب','ماء نقي','ماء البحر','مسحوق الخبيز','مضاد الحموضة','محلول الأمونيا','صابون سائل','مبيض غسيل','منظف مصارف'],K=['#ef3340','#f26b3a','#f7931e','#fdb92f','#f6ec3a','#8dc63f','#52b755','#2fb05a','#16b5ac','#3d8bcd','#3a5fae','#5b5ba6','#614fa0','#6a2c8a','#46286f'];
+  el.innerHTML=`<h2>الرقم الهيدروجيني pH</h2><p>كيف نعرف هل المحلول حمضي أم قاعدي، وأي محلولين أكثر حمضية؟ نستخدم <b>الرقم الهيدروجيني pH</b>: مقياس لدرجة حموضة المحلول، يرتبط بتركيز أيونات H⁺ ويتدرج من <b>0 إلى 14</b>.</p><div class="big" id="n">7</div><input type="range" id="r" min="0" max="14" value="7" step="1"><div style="display:flex;direction:ltr;margin-top:6px">${K.map(c=>`<div style="flex:1;height:26px;background:${c}"></div>`).join('')}</div><div class="fb" id="tx" style="text-align:center;font-size:21px"></div>
+  <p style="font-size:16px;color:var(--mut)">حرّك المؤشر إلى منطقة حمضية، ثم المتعادل (7)، ثم منطقة قاعدية.</p>`;
+  const u=()=>{const p=+$('#r').value;$('#n').textContent=p;$('#n').style.color=K[p];let t=p<7?`حمضي: ${p==0?'الأقوى حمضية (أعلى تركيز H⁺)':'تزداد الحموضة كلما نقصت pH'}`:p==7?'متعادل: ليس حمضيًا ولا قاعديًا (مثل الماء النقي)':`قاعدي: ${p==14?'الأقوى قاعدية (أعلى تركيز OH⁻)':'تزداد القاعدية كلما زادت pH'}`;$('#tx').innerHTML=`<b style="color:${K[p]}">${t}</b><br><small>مثال من الكتاب: ${N[p]}</small>`;v[p<7?'a':p==7?'n':'b']=1;if(v.a&&v.n&&v.b)ok()};
+  $('#r').oninput=u;u();v={};}});
+sc.push({s:2,f(el,ok){let g={};const Q=[['أي المحلولين أكثر حمضية؟',['pH = 2','pH = 5'],0,'كلما انخفضت pH ضمن المجال الحمضي زادت الحموضة (تركيز H⁺ أكبر).'],['أي المحلولين أكثر قاعدية؟',['pH = 9','pH = 13'],1,'كلما ارتفعت pH ضمن المجال القاعدي زادت القاعدية (تركيز OH⁻ أكبر).'],['أي المحاليل متعادل؟',['pH = 7 (ماء نقي)','pH = 9'],0,'pH = 7 تعني متعادلًا: لا حمضي ولا قاعدي.']];
+  el.innerHTML=`<h2>قارن بين المحاليل</h2><p>أمثلة: pH=2 ، pH=5 (حمضيان) — pH=7 ماء نقي — pH=9 ، pH=13 (قاعديان). ⚠️ المقارنة صحيحة عند تساوي التركيز والظروف.</p><div id="qs"></div>`;
+  Q.forEach((q,i)=>{const d=document.createElement('div');d.innerHTML=`<h3>${q[0]}</h3>${q[1].map((o,j)=>`<button>${o}</button>`).join('')}<div class="fb"></div>`;$('#qs').append(d);d.querySelectorAll('button').forEach((b,j)=>b.onclick=()=>{const r=j==q[2];d.querySelector('.fb').innerHTML=r?`<span class="ok">✔ ${q[3]}</span>`:'<span class="bad">فكّر في تدريج pH وحاول مرة أخرى.</span>';if(r){if(!g[i])pts+=10,$('#pts').textContent=pts;g[i]=1;if(Object.keys(g).length==3)ok()}})})}});
+sc.push({s:3,f(el,ok){let g={};const I=[['الكواشف الطبيعية','مثل الملفوف الأحمر والشاي.'],['الكواشف الصناعية','مثل كاشف تبّاع الشمس وكاشف البروموثايمول الأزرق (يتغير لونه من الأصفر في الوسط الحمضي إلى الأزرق في القاعدي).'],['الكاشف العام','مزيج من الكواشف يتغير لونه بحسب طبيعة المحلول؛ نقارن اللون بدليل الألوان لتقدير pH.'],['جهاز pH meter','يعطي قياسًا أدق للرقم الهيدروجيني، ويُستخدم في المجالات الصناعية.']];
+  el.innerHTML=`<h2>كيف نقيس pH؟</h2><p>اضغط كل وسيلة لتتعرف عليها:</p><div class="row">${I.map((x,i)=>`<button data-i="${i}">${x[0]}</button>`).join('')}</div><div class="note" id="tx">اختر وسيلة.</div>`;
+  el.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{const i=b.dataset.i;g[i]=1;$('#tx').innerHTML=`<b>${I[i][0]}:</b> ${I[i][1]}`;if(Object.keys(g).length==4)ok()})}});
+sc.push({s:3,f(el,ok){let g={},cur=null;const L=[['الخل',2],['عصير برتقال',3],['حليب',6],['ماء نقي',7],['ماء البحر',8],['محلول الأمونيا',11],['مبيض غسيل',13]],K=['#ef3340','#f26b3a','#f7931e','#fdb92f','#f6ec3a','#8dc63f','#52b755','#2fb05a','#16b5ac','#3d8bcd','#3a5fae','#5b5ba6','#614fa0','#6a2c8a','#46286f'];
+  el.innerHTML=`<h2>🧪 تجربة افتراضية: الكاشف العام</h2><p>1) اختر محلولًا 2) اغمس الورقة 3) قارن لونها بدليل الألوان واختر pH التقريبية. جرّب 3 محاليل على الأقل.</p><div class="row">${L.map((x,i)=>`<button data-i="${i}">${x[0]}</button>`).join('')}</div><div class="row"><div style="text-align:center"><div id="pp" style="width:46px;height:150px;background:#f5ecd0;border:2px solid #aaa;margin:auto;border-radius:4px;transition:background 1s"></div><button id="dip" disabled>اغمس الورقة</button></div><div style="flex:1;min-width:280px"><p>دليل الألوان — اختر قيمة pH المطابقة:</p><div style="display:flex;direction:ltr;flex-wrap:wrap">${K.map((c,i)=>`<button class="pk" data-p="${i}" style="background:${c};color:#000;min-width:44px;padding:14px 0;margin:2px" disabled>${i}</button>`).join('')}</div></div></div><div class="fb" id="tx"></div>`;
+  el.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{cur=+b.dataset.i;el.querySelectorAll('[data-i]').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');$('#pp').style.background='#f5ecd0';$('#dip').disabled=false;el.querySelectorAll('.pk').forEach(x=>x.disabled=true);$('#tx').textContent='الآن اغمس الورقة.'});
+  $('#dip').onclick=()=>{$('#pp').style.background=K[L[cur][1]];$('#dip').disabled=true;el.querySelectorAll('.pk').forEach(x=>x.disabled=false);$('#tx').textContent='قارن اللون واختر.'};
+  el.querySelectorAll('.pk').forEach(b=>b.onclick=()=>{const d=Math.abs(+b.dataset.p-L[cur][1]);if(d<=1){$('#tx').innerHTML=`<span class="ok">✔ تقدير جيد! ${L[cur][0]} pH ≈ ${L[cur][1]} → ${L[cur][1]<7?'حمضي':L[cur][1]==7?'متعادل':'قاعدي'}.</span> الكاشف العام يعطي تقديرًا تقريبيًا؛ والأدق جهاز pH meter.`;if(!g[cur])pts+=10,$('#pts').textContent=pts;g[cur]=1;if(Object.keys(g).length>=3)ok()}else $('#tx').innerHTML='<span class="bad">اللون لا يطابق تمامًا، انظر إلى الدليل مرة أخرى.</span>'})}});
+/* ---------- quizzes ---------- */
+const Q5=[['a','أيهما يتأيّن كليًّا في الماء؟',['CH₃COOH','HCl'],1,'HCl حمض قوي يتأيّن كليًّا (سهم واحد).'],
+['a','محلولان متساويان في التركيز: أيهما ينتج نسبة أكبر من H⁺؟',['HCl','CH₃COOH'],0,'الحمض القوي يتأيّن كليًّا فينتج أيونات H⁺ أكثر.'],
+['a','لماذا نستخدم سهمين متعاكسين في تأيّن CH₃COOH؟',['لأنه مركّز جدًّا','لأنه يتأيّن جزئيًّا فتبقى جزيئات لم تتأيّن','لأنه أقوى من HCl'],1,'السهمان يدلان على التأيّن الجزئي، والسهم الواحد على التأيّن الكلّي.'],
+['a','أي مما يلي قاعدة تتأيّن كليًّا؟',['NH₃','KOH','N₂H₄'],1,'KOH قاعدة قوية في جدول الكتاب، أما NH₃ و N₂H₄ فقاعدتان ضعيفتان.'],
+['a','ماذا ينتج عن تأيّن NaOH في الماء؟',['Na⁺ و OH⁻','Na⁺ و H⁺','Na و O و H'],0,'NaOH → Na⁺ + OH⁻، وأيونات OH⁻ هي سبب الخصائص القاعدية.'],
+['p','ماذا تعني قيمة pH = 7؟',['حمضي قوي','محلول متعادل','قاعدي قوي'],1,'pH = 7 محلول متعادل: ليس حمضيًّا ولا قاعديًّا.'],
+['p','أي المحلولين أكثر حمضية؟',['pH = 3','pH = 6'],0,'الأقل pH ضمن المجال الحمضي أكثر حموضة.'],
+['p','أي المحلولين أكثر قاعدية؟',['pH = 10','pH = 12'],1,'الأعلى pH ضمن المجال القاعدي أكثر قاعدية.'],
+['c','لماذا يوصل الحمض القوي التيار أفضل من الضعيف عند تساوي التركيز؟',['فيه أيونات حرة متحركة أكثر','لأنه أثقل','لأنه أبرد'],0,'التوصيل يعتمد على عدد الأيونات الحرة المتحركة.'],
+['c','أضاء المصباح بشدة أكبر في المحلول X. ماذا نستنتج؟',['عدد الأيونات الحرة فيه أكبر','لا أيونات فيه','تركيزه أقل دائمًا'],0,'سطوع أكبر = أيونات حرة متحركة أكثر.'],
+['c','هل يكفي أن نعرف أن المادة حمضية لنحكم على توصيل محلولها؟',['نعم، كل الحموض متساوية','لا، يجب معرفة قوتها (نسبة تأيّنها) وتركيزها','نعم، بحسب لونها'],1,'حمض ضعيف يوصل أقل من حمض قوي رغم أن كليهما حمضي.'],
+['t','محلولان حمضيان متساويا التركيز، الأول قوي والثاني ضعيف. أيهما أقل pH؟',['الضعيف','القوي لأن تركيز H⁺ فيه أكبر','متساويان'],1,'الحمض القوي ينتج H⁺ أكثر فتنخفض pH أكثر.'],
+['t','قال طالب: «كلما زادت pH زادت الحموضة». ما التصحيح؟',['صحيح','كلما انخفضت pH زادت الحموضة','لا علاقة لـ pH بالحموضة'],1,'pH الأقل (ضمن المجال الحمضي) تعني حموضة أكبر.'],
+['t','«الحمض المركّز هو بالضرورة حمض قوي». هل توافق؟',['نعم','لا، القوة نسبة التأيّن والتركيز كمية المذاب','نعم إذا كان pH = 7'],1,'قد يكون الحمض الضعيف مركّزًا، والقوي مخفّفًا.']];
+const Q6=[['a','أيّها حمض قوي؟',['CH₃COOH','HNO₃','H₃PO₄'],1,'HNO₃ حمض قوي، أما CH₃COOH و H₃PO₄ فضعيفان.'],
+['a','صح أم خطأ: CH₃COOH يتأيّن جزئيًّا.',['صح','خطأ'],0,'نعم، لذلك نكتبه بسهمين متعاكسين.'],
+['p','أيهما أكثر حمضية؟',['pH = 1','pH = 4'],0,'الأقل pH أكثر حمضية.'],
+['a','كأس A: ○○○○○○ (كلها أيونات) / كأس B: ●○●●●○ (جزيئات + أيونات). أي كأس لحمض قوي؟',['A','B'],0,'التأيّن الكلّي = كل الجسيمات أيونات.'],
+['a','معادلة تأيّن Ca(OH)₂ الصحيحة:',['Ca(OH)₂ → Ca²⁺ + 2OH⁻','Ca(OH)₂ → Ca⁺ + OH⁻','Ca(OH)₂ ⇌ Ca²⁺ + 2OH⁻'],0,'قاعدة قوية (سهم واحد) والشحنات والعدد متوازنة.'],
+['a','أيّها قاعدة قوية؟',['NH₃','NaOH','N₂H₄'],1,'NaOH قاعدة قوية.'],
+['p','صح أم خطأ: كلما زادت pH زادت حموضة المحلول.',['صح','خطأ'],1,'العكس صحيح ضمن المجال الحمضي.'],
+['p','أيهما أكثر قاعدية؟',['pH = 9','pH = 13'],1,'الأعلى pH أكثر قاعدية.'],
+['c','إضاءة المصباح الأشد تدل على:',['أيونات حرة أكثر','جزيئات أكثر','تركيز أقل'],0,'السطوع مرتبط بعدد الأيونات الحرة المتحركة.'],
+['t','صح أم خطأ: الحمض المركّز قوي بالضرورة.',['صح','خطأ'],1,'القوة غير التركيز.']];
+function quiz(el,Q,timed,ok){let i=0;const show=()=>{const q=Q[i];let tm=null,left=15,done=false;el.innerHTML=`<h2>${timed?'⏱️ تحدي السرعة':'🧠 تحدي التفكير'} — سؤال ${i+1}/${Q.length}</h2>${timed?'<div class="tm"><b id="tb"></b></div>':''}<p>${q[1]}</p><div id="o">${q[2].map((o,j)=>`<button class="opt" data-j="${j}"><span class="eq" style="display:inline;background:none;font-size:inherit">${o}</span></button>`).join('')}</div><div class="fb" id="fb"></div><button class="pri" id="nq" style="display:none">${i==Q.length-1?'إنهاء':'السؤال التالي'}</button>`;
+ const fin=(r,t)=>{if(done)return;done=true;clearInterval(tm);tally[q[0]][1]++;if(r){tally[q[0]][0]++;const g=10+(timed?Math.max(0,left):0);pts+=g;$('#pts').textContent=pts;$('#fb').innerHTML=`<span class="ok">✔ أحسنت! +${g}</span>`}else $('#fb').innerHTML=`<span class="bad">${t?'⏰ انتهى الوقت. ':''}الإجابة: <b>${q[2][q[3]]}</b></span><br>${q[4]}`;$('#o').querySelectorAll('button').forEach(b=>b.disabled=true);$('#nq').style.display='';$('#nq').onclick=()=>{i++;i<Q.length?show():ok()}};
+ $('#o').querySelectorAll('button').forEach(b=>b.onclick=()=>fin(+b.dataset.j==q[3]));
+ if(timed){tm=setInterval(()=>{left-=.1;$('#tb').style.width=left/15*100+'%';if(left<=0)fin(false,1)},100);anims.push(()=>clearInterval(tm))}};show()}
+sc.push({s:4,f:(el,ok)=>quiz(el,Q5,false,ok)});
+sc.push({s:5,f:(el,ok)=>quiz(el,Q6,true,ok)});
+sc.push({s:6,f(el){const N={a:'قوة الحموض والقواعد',p:'الرقم الهيدروجيني',c:'التوصيل الكهربائي',t:'التفكير والربط'};let tot=0,r=0;Object.values(tally).forEach(v=>{r+=v[0];tot+=v[1]});const pc=Math.round(r/tot*100);
+ el.innerHTML=`<h2>🏁 النتيجة النهائية</h2><div class="big" style="color:var(--or)">${pts} نقطة</div><p style="text-align:center">إجابات صحيحة: ${r} من ${tot} (${pc}%) — المستوى: <b>${pc>=85?'متقن 🏆':pc>=60?'جيد، يحتاج مراجعة بسيطة 👍':'يحتاج إعادة المحاولة 📘'}</b></p>${Object.keys(N).map(k=>{const v=tally[k],p=v[1]?Math.round(v[0]/v[1]*100):0;return`<div class="mini"><span style="width:170px">${N[k]}</span><div style="width:${p*3}px"></div><span>${p}%</span></div>`}).join('')}<div style="text-align:center"><button class="pri" onclick="location.reload()">↻ إعادة اللعب</button></div>`}});
+/* ---------- engine ---------- */
+function render(){anims.forEach(f=>f());anims=[];const s=sc[idx];$('#stages').innerHTML=STN.map((_,i)=>`<i class="${i<s.s?'ok':i==s.s?'on':''}"></i>`).join('');$('#stn').textContent=s.s<6?`المرحلة ${s.s+1}: ${STN[s.s]}`:'النتيجة';
+ const a=$('#nx');a.disabled=!okSet[idx]&&idx<sc.length-1;a.style.visibility=idx==sc.length-1?'hidden':'';$('#pv').disabled=idx==0||sc[idx].s>=4;
+ $('#rs').style.display=sc[idx].s>=4?'none':'';box.style.animation='none';void box.offsetWidth;box.style.animation='';box.innerHTML='';
+ s.f(box,()=>{okSet[idx]=1;$('#nx').disabled=false;$('#nx').classList.add('pri')})}
+$('#nx').onclick=()=>{if(idx<sc.length-1){idx++;render();scrollTo(0,0)}};
+$('#pv').onclick=()=>{if(idx>0){idx--;render()}};$('#rs').onclick=render;
+render();
+</script></body></html>
